@@ -1,0 +1,16 @@
+# LLM
+anthropic>=0.40
+
+# RAG
+chromadb>=0.5
+sentence-transformers>=3.0
+
+# Data
+pandas>=2.0
+openpyxl>=3.1
+
+# UI
+gradio>=4.44
+
+# Config
+python-dotenv>=1.0
