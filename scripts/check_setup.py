@@ -21,8 +21,12 @@ def main() -> int:
             missing.append(name)
 
     load_dotenv()
-    if os.getenv("ANTHROPIC_API_KEY"):
-        print("  ok      ANTHROPIC_API_KEY is set")
+    key = os.getenv("ANTHROPIC_API_KEY", "")
+    if key.startswith("sk-ant-") and "your-key-here" not in key:
+        print("  ok      ANTHROPIC_API_KEY looks valid")
+    elif key:
+        print("  MISSING ANTHROPIC_API_KEY is still the placeholder from .env.example")
+        missing.append("ANTHROPIC_API_KEY")
     else:
         print("  MISSING ANTHROPIC_API_KEY (copy .env.example to .env)")
         missing.append("ANTHROPIC_API_KEY")
