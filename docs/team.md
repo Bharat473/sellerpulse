@@ -1,8 +1,8 @@
 # SellerPulse: Team, Roles & Stack
 
-**Status:** Task 1 complete. Roles assigned, requirements read, stack agreed. Ready to commit once the repo exists (Task 4).
+**Status:** Task 1 complete; stack revised 2026-09-27. Roles assigned, requirements read, stack agreed. Ready to commit once the repo exists (Task 4).
 **Last updated:** 2026-09-21
-**Team:** Bharat Maripi (solo build; all roles held by one person)
+**Team:** Bharat Maripi and Biswajit (from 27 September; role split to agree between them)
 
 ---
 
@@ -22,7 +22,7 @@ Each role is written as a component contract: what module it owns, what goes in 
 
 | # | Role | Owns (module) | Input → Output | Guarantee | Metric | Failure it prevents | Tasks |
 |---|---|---|---|---|---|---|---|
-| 1 | Prompt / RAG | `prompts/`, `rag/` (corpus, chunking, embeddings, retriever) | Seller question → top-k relevant chunks + system prompt → grounded answer | Every qualitative claim traces back to a retrieved chunk; the model is told never to state numbers itself | Relevant chunk in top 3 for the test queries | A generic answer that sounds plausible but isn't about Meera's listing | 5, 7–10 |
+| 1 | Prompt / RAG | `prompts/`, `rag/` (corpus, chunking, embeddings, retriever) | Seller question → top-k relevant chunks + system prompt → grounded answer | Every qualitative claim traces back to a retrieved chunk **and cites its source** (e.g. `REV-504`, policy §2); the model is told never to state numbers itself. Policy text is chunked so sentences stay whole and tagged with their section, so it can be quoted exactly | Relevant chunk in top 3 for the test queries | A generic answer that sounds plausible but isn't about Meera's listing | 5, 7–10 |
 | 2 | Tools / MCP | `tools/`, MCP server | Structured call (`seller_id`, `period` / `sku`) → exact figures or an explicit error | Numbers come only from the data; failures are reported, never hidden | 100% correct on known cases; clear error on invalid input | An invented or estimated sales or stock figure | 12–15 |
 | 3 | Memory | `memory/` (schema + store) | Preference statement → stored record; new session → recalled preferences | Stored preferences are applied and never silently overridden | Session 2 recalls the session 1 preference without being asked | The agent forgetting Meera's tone, cadence or threshold | 16–17 |
 | 4 | Guardrails / caching | `guardrails/`, `cache/` | Draft agent output → checked output (allowed / blocked / labelled draft); repeated query → cached result | Policy violations are refused with an alternative; customer-facing text is never published without approval | Gift request refused; every reply labelled as a draft; cache hit on a repeat query | Auto-posting a reply, or recommending review manipulation | 19–25 |
@@ -37,19 +37,22 @@ Each role is written as a component contract: what module it owns, what goes in 
 
 ---
 
-## 3. Stack (agreed)
+## 3. Stack (agreed; revised 2026-09-27)
+
+**Change of stack:** on 27 September Abhijit, in his architect role, set the build stack for the team: Groq with an open GPT-OSS model, LangChain, `pyproject.toml` with uv, and Gradio. The original choices and their reasoning are kept in the decision log below, because the comparison is still useful evidence.
 
 | Layer | Choice | Reason | Alternatives considered |
 |---|---|---|---|
 | Language | Python | Fixed | — |
-| LLM provider | **Claude (Anthropic API): Haiku for development, Sonnet for demo and evals** | Strong tool use and instruction following, which the "never invent numbers" and "drafts only" rules depend on. Same model family I already build with in Claude Code. Personal API key, separate from any subscription or employer account. Budget: about €5–10 for the whole project, with a spend limit set in the Console. All LLM calls go through one `llm.py` wrapper, so the provider can be swapped. | Rejected: OpenAI (one vendor for chat + embeddings, but no strong reason to switch); local model via Ollama (free and private, but weaker at tool use); cheaper APIs such as GPT-4o mini, DeepSeek and Gemini Flash-Lite (4–7× cheaper per question, but only about €5 saved at prototype scale) |
-| Orchestration | **Raw Anthropic Python SDK** | I write the retrieval step, prompt assembly, agent loop and retries myself, in small blocks. I can see, log and explain every step, which matters for tuning quality (70%→95%) and for design reviews. | Rejected: Claude Agent SDK (runs the loop for me, so I can't see or explain it; built for file/shell agents); LangChain (heavy abstraction, hard-to-trace errors, frequent API changes); LlamaIndex (strong at retrieval, but key choices like chunk size, top-k, embedding model and prompt template come from defaults I might not know I rely on). **Checkpoint:** revisit at Task 15 (MCP). |
-| Embedding model | **`BAAI/bge-small-en-v1.5`, run locally via `sentence-transformers`** (fallback: `all-MiniLM-L6-v2`) | Free, so it fits the budget. No API key, so a fresh clone runs from the README (Task 4). Trained for search on English text, which matches the corpus. Produces 384 numbers per text (about 1.5 MB for ~1,000 chunks). Sits behind one `embed()` function so it can be swapped. Task 9 (Boho chunk in the top 3) is the test. | Rejected: OpenAI embeddings and Voyage (a second vendor, key and bill; quality gain barely visible at this corpus size); keyword search (BM25) alone (misses meaning: "shipping delay" ≠ "late delivery"). **Kept in reserve:** keyword + embedding (hybrid) search as a Week 4 fix for exact codes like `SKU-1001` |
-| Vector store | **Chroma (local, saved to a project folder)** | Runs with no server and persists to disk, so a fresh clone works and nothing is re-embedded on every run. **Metadata filtering** (e.g. `sku = SKU-1001`, `type = policy`, `seller_id`) keeps retrieval on the right product and document type. Simple enough to stay transparent. **Two rules:** (1) always pass my own `bge` embeddings, so Chroma's default embedding model is never used; (2) set the distance measure to cosine explicitly. A prototype choice: at 100k sellers I'd move to pgvector or a managed service. | Rejected: FAISS (very fast, but no metadata filtering or text storage; speed wasted on ~1,000 chunks); pgvector (production-grade, but needs a Postgres server, which breaks clone-and-run); plain NumPy (fully transparent, but I'd hand-build saving and filtering; kept as an optional Task 9 cross-check) |
+| LLM | **`openai/gpt-oss-20b` on Groq** (`120b` available if quality needs it) | Set by the architect. Free tier, very fast inference, open-weight model. All calls go through one `src/llm.py` wrapper so the model or provider can be swapped | Earlier choice: Claude via the Anthropic API (stronger tool use, but a paid API). Trade-off accepted: a smaller open model, so quality has to come from retrieval and prompting, and tool calling must be tested early in Week 2 |
+| Orchestration | **LangChain** (`langchain`, `langchain-groq`) | Set by the architect. Ready integrations for Groq, Chroma, HuggingFace embeddings and MCP; the team works in one framework | Earlier choice: raw Anthropic SDK, for transparency. Mitigation: keep chains small, read every line, and write retrieval filters and guardrail checks as plain Python |
+| Embedding model | **`BAAI/bge-small-en-v1.5`, local** via `langchain-huggingface` | Unchanged. Groq has no embeddings API, so embeddings stay local: free, keyless, 384 numbers per text. Validated by the Task 9 top-3 test | Rejected: OpenAI embeddings and Voyage (extra vendor, key and bill); BM25 alone (misses meaning). Hybrid search kept in reserve for Week 4 |
+| Vector store | **Chroma, local** via `langchain-chroma` | Unchanged. No server, persists to disk, metadata filtering by `sku`, `type` and `seller_id`. Always pass our own embeddings; set cosine distance explicitly | Rejected: FAISS (no metadata filtering), pgvector (needs a server), plain NumPy (kept as an optional cross-check) |
+| Packaging | **uv + `pyproject.toml` + `uv.lock`** | Set by the architect. `uv sync` reproduces the exact environment from the lock file, which `requirements.txt` with `>=` does not | Earlier: venv + pip + `requirements.txt` |
 | UI | Gradio | Fixed by Task 11 | — |
-| Dev environment | VS Code + Claude Code | Already set up. Build-time tool only: it does not ship and did not decide the runtime stack | — |
-
-Every choice above was made by comparing alternatives against the project's requirements (LLD evidence). Each is testable, not permanent: Task 9 validates the embedding model and vector store, and the Week 4 evals validate the LLM choice.
+| Code size | Keep each file minimal (under about 60 lines) | Architect's rule: small enough to read and explain line by line | — |
+| Dev environment | VS Code + Claude Code | Build-time tool only; it does not ship | — |
+| Secrets | `GROQ_API_KEY` in `.env` (git-ignored); `.env.example` shows the variable only | Keys never enter the repo | — |
 
 ### How the pieces connect (first HLD sketch)
 
@@ -59,7 +62,7 @@ Meera (Gradio UI)
       → [lookup] "Boho Wall Hanging" → SKU-1001
       → embed(question) with bge-small
       → Chroma search, filter sku=SKU-1001 → top-3 chunks
-      → llm.py → Claude (system prompt + chunks + question)
+      → llm.py → gpt-oss on Groq via LangChain (system prompt + chunks + question)
             ↺ [Week 2] Claude asks for a tool → my code runs it → result back to Claude
             ↺ [Week 2] memory: Meera's preferences added to the prompt
       → answer (drafts labelled, every step logged)
@@ -73,7 +76,7 @@ Meera (Gradio UI)
 | 3 | Listing lookup | Turns "Boho Wall Hanging" into `SKU-1001` using the listings table. Ambiguous names are the Task 32 edge case | `rag/lookup.py` | Task 9–10 |
 | 4 | Embed | `bge-small` turns the question into 384 numbers | `rag/embed.py` | Task 8 |
 | 5 | Retrieve | Chroma returns the nearest chunks, filtered to `sku = SKU-1001` | `rag/retrieve.py` | Task 9 |
-| 6 | LLM call | System prompt + top-3 chunks + question sent to Claude through the one wrapper | `llm.py` | Task 5 |
+| 6 | LLM call | System prompt + top-3 chunks + question sent to the model through the one wrapper | `llm.py` | Task 5 |
 | 7 | Tool loop (↺) | Claude *asks* for a tool (e.g. stock level); it can't run it itself, so my code runs it and sends the result back. Repeats until Claude writes the final answer | `tools/`, `agent.py` | Week 2 |
 | 8 | Memory (↺) | Meera's stored preferences (tone, cadence, threshold) are added to the prompt | `memory/` | Week 2 |
 | 9 | Answer | Grounded diagnosis; drafts labelled; each step logged | — | Week 1 basic; Weeks 3–4 full |
@@ -97,7 +100,10 @@ Meera (Gradio UI)
 | 2026-09-21 | Embeddings = `bge-small-en-v1.5`, local | Free, keyless and good at search. Same model for documents and questions; swappable behind `embed()`; to be validated by the Task 9 top-3 test |
 | 2026-09-21 | Added a listing-lookup step before retrieval; drew the tool step as a loop with Claude | Metadata filtering needs the SKU first; tools run in a loop that Claude drives, not as a final step |
 | 2026-09-21 | Vector store = Chroma (local) | No server, persists to disk, metadata filtering. Always pass my own embeddings; cosine distance set explicitly |
-| Planned (Week 4) | Cost vs quality experiment: run the same evals on Haiku, Sonnet and one cheap model (e.g. GPT-4o mini) | Turns "which model?" into evidence; matches the stretch goal of under $0.01 per query |
+| 2026-09-22 | Answers cite their sources; policy chunks keep sentences whole | Found by mapping 6-pager §4 capabilities to components: "points to the review it relied on" and "quotes the policy line" had no owner |
+| 2026-09-27 | Stack changed to Groq (`gpt-oss-20b`) + LangChain + uv/pyproject + Gradio | Set by Abhijit in the architect role for the team. Embeddings and vector store unchanged. Accepted trade-offs: weaker tool calling than a frontier model, and less visibility inside LangChain chains |
+| 2026-09-27 | Team is now two: Bharat and Biswajit | One shared 6-pager and PR/FAQ, agreed by both |
+| Planned (Week 4) | Model comparison: run the same evals on `gpt-oss-20b` and `gpt-oss-120b` | Turns "which model?" into evidence: score against latency and free-tier usage |
 
 ---
 
