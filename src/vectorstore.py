@@ -3,6 +3,8 @@
 Ingestion (Task 8) and retrieval (Task 9) both import from here,
 so they always use exactly the same model and settings.
 """
+from functools import lru_cache
+
 from langchain_chroma import Chroma
 from langchain_huggingface import HuggingFaceEmbeddings
 
@@ -16,6 +18,7 @@ def get_embeddings():
                                  encode_kwargs={"normalize_embeddings": True})
 
 
+@lru_cache  # build the store (and load the model) once, then reuse it
 def get_store():
     return Chroma(collection_name=COLLECTION, embedding_function=get_embeddings(),
                   persist_directory=STORE_DIR,

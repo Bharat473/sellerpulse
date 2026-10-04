@@ -1,13 +1,21 @@
-"""SellerPulse agent, Week 1: system prompt only. Reviews and policy arrive with RAG
-(Tasks 7-10); sales and stock figures arrive with tools (Week 2)."""
+"""SellerPulse agent, Week 1: answers from buyer reviews, listings and policy (RAG, Task 10).
+Sales and stock figures arrive with tools in Week 2.
+
+Terminal:  uv run python agent.py "Why is my Boho Wall Hanging listing underperforming?"
+Browser:   uv run python agent.py
+"""
+import sys
 from datetime import date
 from pathlib import Path
 
 import gradio as gr
+from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 
 from src.llm import get_llm
+from src.retrieval import retrieve
 
+SELLER_ID = "S001"
 SELLER_NAME = "Meera Iyer"
 STORE_NAME = "Meera Home Studio"
 TODAY = date(2026, 9, 16)  # fixed so "last week" matches the synthetic data window
@@ -15,40 +23,51 @@ SYSTEM_PROMPT = Path("src/prompts/system.md").read_text()
 
 prompt = ChatPromptTemplate.from_messages([
     ("system", SYSTEM_PROMPT),
-    ("human", "{question}"),
+    ("human", "Shop data:\n{context}\n\nQuestion: {question}"),
 ])
-chain = prompt | get_llm()
+chain = prompt | get_llm() | StrOutputParser()
+
+
+def get_context(question: str) -> str:
+    _, hits = retrieve(question, SELLER_ID)
+    if not hits:
+        return "(no matching shop data)"
+    return "\n\n".join(f"[{doc.metadata['id']}] {doc.page_content}" for doc, _ in hits)
 
 
 def ask_agent(question: str) -> str:
     if not question.strip():
         return "Please enter a question."
     try:
-        response = chain.invoke({
+        return chain.invoke({
+            "context": get_context(question),
             "question": question,
             "seller_name": SELLER_NAME,
             "store_name": STORE_NAME,
             "today": TODAY.strftime("%A %d %B %Y"),
         })
     except Exception as err:  # e.g. a stray tool call or a rate limit from Groq
-        print(f"LLM error: {err}")
+        print(f"Agent error: {err}")
         return "Sorry, I couldn't answer that just now. Please try again in a moment."
-    return response.content
 
 
 demo = gr.Interface(
     fn=ask_agent,
-    inputs=gr.Textbox(label="Ask about your shop", placeholder="e.g. How did my sales perform last week?"),
+    inputs=gr.Textbox(label="Ask about your shop", placeholder="e.g. Why is my Boho Wall Hanging listing underperforming?"),
     outputs=gr.Textbox(label="Answer"),
     title="SellerPulse",
     description="Ask questions about your Setukart shop.",
     examples=[
-        ["How did my sales perform last week?"],
-        ["Draft a reply to this 2-star review: 'Nice rug but delivery took almost 3 weeks.'"],
+        ["Why is my Boho Wall Hanging listing underperforming?"],
         ["Can you offer buyers a free gift for leaving a 5-star review?"],
-        ["How is my throw doing?"],
+        ["How did my sales perform last week?"],
     ],
 )
 
 if __name__ == "__main__":
-    demo.launch()
+    if len(sys.argv) > 1:
+        question = " ".join(sys.argv[1:])
+        print(f"QUESTION\n{question}\n\nSHOP DATA SENT TO THE LLM\n{get_context(question)}\n")
+        print(f"ANSWER\n{ask_agent(question)}")
+    else:
+        demo.launch()
