@@ -2,7 +2,7 @@
 Sales and stock figures arrive with tools in Week 2.
 
 Terminal:  uv run python agent.py "Why is my Boho Wall Hanging listing underperforming?"
-Browser:   uv run python agent.py
+Browser:   uv run python agent.py            (add --share for a temporary public link)
 """
 import sys
 from datetime import date
@@ -51,23 +51,28 @@ def ask_agent(question: str) -> str:
         return "Sorry, I couldn't answer that just now. Please try again in a moment."
 
 
-demo = gr.Interface(
-    fn=ask_agent,
-    inputs=gr.Textbox(label="Ask about your shop", placeholder="e.g. Why is my Boho Wall Hanging listing underperforming?"),
-    outputs=gr.Textbox(label="Answer"),
+def chat(message, history):  # history is shown on screen only; memory arrives in Week 2
+    return ask_agent(message)
+
+
+demo = gr.ChatInterface(
+    fn=chat,
     title="SellerPulse",
-    description="Ask questions about your Setukart shop.",
+    description=f"Hi {SELLER_NAME}! Ask about your {STORE_NAME} listings, reviews and Setukart policy. "
+                "Each question is answered on its own; sales and stock figures are coming soon.",
     examples=[
-        ["Why is my Boho Wall Hanging listing underperforming?"],
-        ["Can you offer buyers a free gift for leaving a 5-star review?"],
-        ["How did my sales perform last week?"],
+        "Why is my Boho Wall Hanging listing underperforming?",
+        "Can I offer buyers a free gift for leaving a 5-star review?",
+        "How did my sales perform last week?",
+        "Draft a reply to this 3-star review: 'Cute but smaller than expected for the price.'",
     ],
 )
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1:
-        question = " ".join(sys.argv[1:])
+    args = sys.argv[1:]
+    if args and args[0] != "--share":
+        question = " ".join(args)
         print(f"QUESTION\n{question}\n\nSHOP DATA SENT TO THE LLM\n{get_context(question)}\n")
         print(f"ANSWER\n{ask_agent(question)}")
     else:
-        demo.launch()
+        demo.launch(share="--share" in args)
