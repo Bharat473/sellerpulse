@@ -1,59 +1,52 @@
-import os
-from dotenv import load_dotenv
-from langchain_groq import ChatGroq
-from langchain_core.prompts import ChatPromptTemplate
+"""SellerPulse agent, Week 1: system prompt only. Reviews and policy arrive with RAG
+(Tasks 7-10); sales and stock figures arrive with tools (Week 2)."""
+from datetime import date
+from pathlib import Path
+
 import gradio as gr
+from langchain_core.prompts import ChatPromptTemplate
 
-load_dotenv()
+from src.llm import get_llm
 
-SELLER_DATA = """
-Seller Performance Data (Q3 2024):
-
-| Seller        | Orders | Revenue   | Rating | Returns | Fulfillment |
-|---------------|--------|-----------|--------|---------|-------------|
-| TechGadgets   | 1,240  | $89,500   | 4.7    | 2.1%    | 98.2%       |
-| FashionHub    | 3,100  | $145,200  | 4.3    | 8.4%    | 95.1%       |
-| HomeDecorPlus | 780    | $62,300   | 4.8    | 1.2%    | 99.0%       |
-| SportZone     | 2,050  | $112,400  | 4.1    | 5.7%    | 93.8%       |
-| BookWorld     | 4,500  | $67,800   | 4.9    | 0.8%    | 99.5%       |
-
-Metrics explanation:
-- Returns: percentage of orders returned
-- Fulfillment: on-time delivery rate
-"""
-
-llm = ChatGroq(
-    model="openai/gpt-oss-120b",
-    api_key=os.getenv("GROQ_API_KEY"),
-    temperature=0,
-)
+SELLER_NAME = "Meera Iyer"
+STORE_NAME = "Meera Home Studio"
+TODAY = date(2026, 9, 16)  # fixed so "last week" matches the synthetic data window
+SYSTEM_PROMPT = Path("src/prompts/system.md").read_text()
 
 prompt = ChatPromptTemplate.from_messages([
-    ("system", f"You are a seller performance analyst. Use this data to answer questions:\n{SELLER_DATA}"),
+    ("system", SYSTEM_PROMPT),
     ("human", "{question}"),
 ])
-
-chain = prompt | llm
+chain = prompt | get_llm()
 
 
 def ask_agent(question: str) -> str:
     if not question.strip():
         return "Please enter a question."
-    response = chain.invoke({"question": question})
+    try:
+        response = chain.invoke({
+            "question": question,
+            "seller_name": SELLER_NAME,
+            "store_name": STORE_NAME,
+            "today": TODAY.strftime("%A %d %B %Y"),
+        })
+    except Exception as err:  # e.g. a stray tool call or a rate limit from Groq
+        print(f"LLM error: {err}")
+        return "Sorry, I couldn't answer that just now. Please try again in a moment."
     return response.content
 
 
 demo = gr.Interface(
     fn=ask_agent,
-    inputs=gr.Textbox(label="Ask about seller performance", placeholder="e.g. Who has the highest revenue?"),
+    inputs=gr.Textbox(label="Ask about your shop", placeholder="e.g. How did my sales perform last week?"),
     outputs=gr.Textbox(label="Answer"),
-    title="SellerPulse Agent",
-    description="Ask natural language questions about seller performance data.",
+    title="SellerPulse",
+    description="Ask questions about your Setukart shop.",
     examples=[
-        ["Which seller has the best rating?"],
-        ["Who has the lowest return rate?"],
-        ["Compare fulfillment rates across all sellers."],
-        ["Which seller should I be concerned about and why?"],
+        ["How did my sales perform last week?"],
+        ["Draft a reply to this 2-star review: 'Nice rug but delivery took almost 3 weeks.'"],
+        ["Can you offer buyers a free gift for leaving a 5-star review?"],
+        ["How is my throw doing?"],
     ],
 )
 
