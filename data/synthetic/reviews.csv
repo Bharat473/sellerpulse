@@ -1,0 +1,103 @@
+seller_id,review_id,sku,order_id,rating,comment,review_date
+S001,REV-1003,SKU-1072,ORD-100014,4,"Good quality, arrived a few days late.",2026-07-26
+S001,REV-1001,SKU-1087,ORD-100005,3,"Decent, but smaller than expected.",2026-07-28
+S001,REV-1008,SKU-1027,ORD-100025,3,"Decent, but smaller than expected.",2026-07-29
+S001,REV-1004,SKU-1111,ORD-100016,4,"Good quality, arrived a few days late.",2026-07-30
+S001,REV-1007,SKU-1017,ORD-100024,4,"Good quality, arrived a few days late.",2026-07-30
+S002,REV-1010,SKU-2021,ORD-100040,3,"Fine product, the packaging was damaged.",2026-07-30
+S001,REV-1005,SKU-1004,ORD-100021,3,"Decent, but smaller than expected.",2026-07-31
+S002,REV-1012,SKU-2008,ORD-100072,4,"Lovely piece, the colour is a little darker than the photo.",2026-08-01
+S001,REV-1009,SKU-1142,ORD-100039,4,"Really nice, though slightly smaller than I imagined.",2026-08-02
+S001,REV-1011,SKU-1103,ORD-100068,3,"Decent, but smaller than expected.",2026-08-02
+S001,REV-1013,SKU-1045,ORD-100081,4,"Lovely piece, the colour is a little darker than the photo.",2026-08-03
+S001,REV-1015,SKU-1131,ORD-100085,5,Beautiful quality and carefully packed.,2026-08-03
+S001,REV-1021,SKU-1111,ORD-100129,5,"Absolutely love it, looks even better in person.",2026-08-04
+S001,REV-1014,SKU-1129,ORD-100084,5,Exactly as pictured. Would buy again.,2026-08-05
+S002,REV-1017,SKU-2004,ORD-100116,4,"Really nice, though slightly smaller than I imagined.",2026-08-05
+S001,REV-1020,SKU-1084,ORD-100126,5,"Absolutely love it, looks even better in person.",2026-08-05
+S002,REV-1018,SKU-2026,ORD-100119,4,"Really nice, though slightly smaller than I imagined.",2026-08-07
+S001,REV-1027,SKU-1102,ORD-100164,4,"Lovely piece, the colour is a little darker than the photo.",2026-08-07
+S001,REV-1002,SKU-1001,ORD-100010,3,"Decent, but smaller than expected.",2026-08-08
+S001,REV-1024,SKU-1001,ORD-100146,3,"It's okay, the finish is a bit uneven.",2026-08-08
+S001,REV-1016,SKU-1097,ORD-100110,4,"Really nice, though slightly smaller than I imagined.",2026-08-09
+S002,REV-1019,SKU-2027,ORD-100120,3,"Decent, but smaller than expected.",2026-08-09
+S001,REV-1026,SKU-1150,ORD-100156,4,"Lovely piece, the colour is a little darker than the photo.",2026-08-09
+S001,REV-1022,SKU-1033,ORD-100135,4,"Really nice, though slightly smaller than I imagined.",2026-08-10
+S001,REV-1023,SKU-1129,ORD-100141,5,Exactly as pictured. Would buy again.,2026-08-10
+S001,REV-1028,SKU-1001,ORD-100170,3,"Decent, but smaller than expected.",2026-08-10
+S001,REV-1029,SKU-1142,ORD-100178,4,"Really nice, though slightly smaller than I imagined.",2026-08-11
+S002,REV-1031,SKU-2019,ORD-100190,4,"Good quality, arrived a few days late.",2026-08-11
+S001,REV-1032,SKU-1001,ORD-100191,4,"Really nice, though slightly smaller than I imagined.",2026-08-11
+S001,REV-1030,SKU-1001,ORD-100180,4,"Lovely piece, the colour is a little darker than the photo.",2026-08-13
+S001,REV-1033,SKU-1053,ORD-100193,4,"Really nice, though slightly smaller than I imagined.",2026-08-13
+S001,REV-1006,SKU-1006,ORD-100022,3,Lovely rug but it took far longer to arrive than the listing said.,2026-08-14
+S001,REV-1036,SKU-1132,ORD-100199,4,"Good quality, arrived a few days late.",2026-08-14
+S001,REV-1034,SKU-1111,ORD-100196,4,"Good quality, arrived a few days late.",2026-08-15
+S001,REV-1035,SKU-1125,ORD-100197,5,"Absolutely love it, looks even better in person.",2026-08-15
+S001,REV-1037,SKU-1039,ORD-100217,5,Beautiful quality and carefully packed.,2026-08-16
+S002,REV-1042,SKU-2019,ORD-100266,2,Smaller than described for the price.,2026-08-16
+S001,REV-1025,SKU-1069,ORD-100151,3,"Fine product, the packaging was damaged.",2026-08-17
+S001,REV-1038,SKU-1105,ORD-100239,2,Arrived later than promised and the box was crushed.,2026-08-17
+S001,REV-1040,SKU-1086,ORD-100256,2,Arrived later than promised and the box was crushed.,2026-08-18
+S001,REV-1041,SKU-1105,ORD-100259,5,Beautiful quality and carefully packed.,2026-08-18
+S001,REV-1043,SKU-1074,ORD-100273,4,"Good quality, arrived a few days late.",2026-08-18
+S001,REV-1045,SKU-1063,ORD-100289,4,"Good quality, arrived a few days late.",2026-08-18
+S001,REV-1046,SKU-1072,ORD-100291,2,The colour is quite different from the listing.,2026-08-18
+S001,REV-1039,SKU-1097,ORD-100246,4,"Really nice, though slightly smaller than I imagined.",2026-08-19
+S001,REV-1047,SKU-1100,ORD-100292,5,"Absolutely love it, looks even better in person.",2026-08-19
+S001,REV-1049,SKU-1036,ORD-100301,5,Beautiful quality and carefully packed.,2026-08-19
+S001,REV-1044,SKU-1122,ORD-100280,5,Exactly as pictured. Would buy again.,2026-08-20
+S001,REV-501,SKU-1001,,5,"Beautiful and well made, arrived fast!",2026-08-20
+S001,REV-1048,SKU-1137,ORD-100294,4,"Lovely piece, the colour is a little darker than the photo.",2026-08-22
+S001,REV-1053,SKU-1139,ORD-100353,5,Beautiful quality and carefully packed.,2026-08-22
+S001,REV-1051,SKU-1109,ORD-100339,5,"Absolutely love it, looks even better in person.",2026-08-23
+S001,REV-1052,SKU-1137,ORD-100352,5,"Absolutely love it, looks even better in person.",2026-08-23
+S001,REV-1054,SKU-1063,ORD-100362,3,"Fine product, the packaging was damaged.",2026-08-23
+S002,REV-1050,SKU-2021,ORD-100331,4,"Good quality, arrived a few days late.",2026-08-25
+S001,REV-1056,SKU-1150,ORD-100368,4,"Lovely piece, the colour is a little darker than the photo.",2026-08-25
+S001,REV-1059,SKU-1115,ORD-100375,3,"It's okay, the finish is a bit uneven.",2026-08-25
+S001,REV-1061,SKU-1072,ORD-100401,4,"Lovely piece, the colour is a little darker than the photo.",2026-08-25
+S001,REV-502,SKU-1006,,2,Nice rug but delivery took almost 3 weeks.,2026-08-25
+S001,REV-1060,SKU-1017,ORD-100384,5,"Absolutely love it, looks even better in person.",2026-08-26
+S001,REV-1055,SKU-1120,ORD-100366,2,Arrived later than promised and the box was crushed.,2026-08-27
+S001,REV-1058,SKU-1047,ORD-100374,4,"Lovely piece, the colour is a little darker than the photo.",2026-08-28
+S001,REV-1065,SKU-1017,ORD-100418,4,"Lovely piece, the colour is a little darker than the photo.",2026-08-28
+S001,REV-503,SKU-1004,,4,"Good quality linen, color slightly different than photo.",2026-08-28
+S001,REV-1063,SKU-1136,ORD-100413,4,"Good quality, arrived a few days late.",2026-08-29
+S001,REV-1064,SKU-1147,ORD-100414,5,Beautiful quality and carefully packed.,2026-08-29
+S001,REV-1066,SKU-1111,ORD-100422,3,"Decent, but smaller than expected.",2026-08-29
+S001,REV-1057,SKU-1024,ORD-100371,4,"Lovely piece, the colour is a little darker than the photo.",2026-08-30
+S001,REV-1068,SKU-1131,ORD-100436,4,"Good quality, arrived a few days late.",2026-09-01
+S001,REV-1071,SKU-1061,ORD-100458,4,"Lovely piece, the colour is a little darker than the photo.",2026-09-01
+S001,REV-1062,SKU-1134,ORD-100412,4,"Really nice, though slightly smaller than I imagined.",2026-09-02
+S001,REV-1075,SKU-1082,ORD-100493,3,"Decent, but smaller than expected.",2026-09-02
+S001,REV-504,SKU-1001,,3,Cute but smaller than expected for the price.,2026-09-02
+S001,REV-1067,SKU-1105,ORD-100433,5,"Absolutely love it, looks even better in person.",2026-09-03
+S001,REV-1069,SKU-1053,ORD-100441,4,"Lovely piece, the colour is a little darker than the photo.",2026-09-03
+S002,REV-1072,SKU-2001,ORD-100468,3,"It's okay, the finish is a bit uneven.",2026-09-03
+S001,REV-505,SKU-1008,,1,Item shown as available but order got cancelled.,2026-09-03
+S002,REV-1085,SKU-2022,ORD-100540,4,"Lovely piece, the colour is a little darker than the photo.",2026-09-05
+S001,REV-1073,SKU-1072,ORD-100472,2,The colour is quite different from the listing.,2026-09-06
+S001,REV-1078,SKU-1088,ORD-100510,5,"Absolutely love it, looks even better in person.",2026-09-06
+S002,REV-1083,SKU-2026,ORD-100530,4,"Good quality, arrived a few days late.",2026-09-06
+S001,REV-506,SKU-1010,,5,"Super soft and warm, buying another for a gift.",2026-09-06
+S001,REV-1076,SKU-1135,ORD-100500,3,"Fine product, the packaging was damaged.",2026-09-07
+S001,REV-1080,SKU-1078,ORD-100522,4,"Really nice, though slightly smaller than I imagined.",2026-09-07
+S001,REV-1082,SKU-1097,ORD-100525,4,"Good quality, arrived a few days late.",2026-09-07
+S001,REV-1084,SKU-1033,ORD-100534,5,"Absolutely love it, looks even better in person.",2026-09-08
+S001,REV-1070,SKU-1053,ORD-100456,5,Beautiful quality and carefully packed.,2026-09-09
+S002,REV-1077,SKU-2022,ORD-100503,3,"Decent, but smaller than expected.",2026-09-09
+S001,REV-507,SKU-1007,,4,"Planters are lovely, one had a small chip.",2026-09-09
+S001,REV-1074,SKU-1131,ORD-100483,4,"Good quality, arrived a few days late.",2026-09-10
+S001,REV-1079,SKU-1045,ORD-100520,4,"Good quality, arrived a few days late.",2026-09-10
+S001,REV-1086,SKU-1111,ORD-100547,4,"Good quality, arrived a few days late.",2026-09-10
+S001,REV-1081,SKU-1095,ORD-100524,5,Exactly as pictured. Would buy again.,2026-09-11
+S001,REV-1087,SKU-1026,ORD-100561,4,"Good quality, arrived a few days late.",2026-09-11
+S001,REV-508,SKU-1006,,2,"Shipping delay again, love the rug itself though.",2026-09-11
+S001,REV-1089,SKU-1087,ORD-100579,4,"Good quality, arrived a few days late.",2026-09-12
+S001,REV-1094,SKU-1138,ORD-100601,5,Exactly as pictured. Would buy again.,2026-09-12
+S001,REV-1091,SKU-1018,ORD-100591,5,Beautiful quality and carefully packed.,2026-09-13
+S001,REV-1088,SKU-1029,ORD-100562,3,"Decent, but smaller than expected.",2026-09-14
+S002,REV-1090,SKU-2019,ORD-100584,3,"Fine product, the packaging was damaged.",2026-09-14
+S001,REV-1093,SKU-1081,ORD-100599,3,"Fine product, the packaging was damaged.",2026-09-14
+S001,REV-1092,SKU-1027,ORD-100592,5,Exactly as pictured. Would buy again.,2026-09-15

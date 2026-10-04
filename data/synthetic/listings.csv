@@ -1,0 +1,181 @@
+seller_id,sku,title,category,price_usd,stock_qty,status,description
+S001,SKU-1001,Boho Wall Hanging - Macrame,Wall Decor,34.99,6,Active,Handmade macrame wall hanging in natural cotton cord. Adds warmth and texture to any room.
+S001,SKU-1002,Ceramic Table Vase - Ivory,Vases,22.5,0,Out of Stock,"Matte ivory stoneware vase. Height 25 cm, opening 8 cm. Not watertight for fresh flowers."
+S001,SKU-1003,Rattan Pendant Light Shade,Lighting,58.0,14,Active,"Hand-woven rattan shade for E27 fittings. Diameter 40 cm, height 30 cm. Bulb not included."
+S001,SKU-1004,Linen Throw Pillow Cover Set (2),Textiles,19.99,32,Active,"Two stonewashed linen cushion covers, 45 x 45 cm, with hidden zip. Inserts not included."
+S001,SKU-1005,Wooden Floating Shelf - Walnut,Shelving,27.75,9,Active,Solid walnut shelf with concealed bracket. 60 x 15 x 4 cm. Holds up to 10 kg.
+S001,SKU-1006,Handwoven Jute Area Rug 4x6,Rugs,89.0,3,Low Stock,"Natural jute rug, 120 x 180 cm (4 x 6 ft). Hand-braided. Ships from the workshop in 10-14 days."
+S001,SKU-1007,Terracotta Planter Trio,Planters,31.2,21,Active,"Set of three unglazed terracotta pots, 10, 14 and 18 cm, with drainage holes and saucers."
+S001,SKU-1008,Brass Wall Sconce - Set of 2,Lighting,64.5,0,Out of Stock,"Pair of brushed brass wall lights, 22 cm arm, hardwired. Requires an electrician to install."
+S001,SKU-1009,Cotton Woven Table Runner,Textiles,14.25,40,Active,"Handloom cotton runner, 35 x 180 cm, fringed ends. Machine washable at 30 degrees."
+S001,SKU-1010,Winter Sherpa Throw Blanket,Textiles,42.0,17,Active,"Reversible sherpa and knit throw, 130 x 170 cm. Machine washable."
+S001,SKU-1011,Mango Wood Board - Terracotta,Kitchen & Dining,26.99,0,Out of Stock,Hand-finished mango wood board in terracotta. 40 x 20 cm.
+S001,SKU-1012,Ceramic Bud Vase - Indigo,Vases,12.99,57,Active,Stoneware ceramic bud vase in indigo. Height 12 cm.
+S001,SKU-1013,Round Rattan Mirror - Ochre,Mirrors,47.99,4,Low Stock,Rattan round rattan mirror in ochre. Diameter 50 cm.
+S001,SKU-1014,Woven Wall Basket - Terracotta,Wall Decor,37.99,27,Active,Handmade woven wall basket in terracotta. Diameter 30 cm.
+S001,SKU-1015,Glass Carafe Vase - Ochre,Vases,18.99,18,Active,Stoneware glass carafe vase in ochre. Height 28 cm.
+S001,SKU-1016,Stoneware Serving Bowl - Ivory,Kitchen & Dining,26.99,42,Active,Hand-finished stoneware serving bowl in ivory. Diameter 26 cm.
+S001,SKU-1017,Oak Wall Ledge - Sage,Shelving,27.99,9,Active,Solid oak oak wall ledge in sage. 80 x 10 cm.
+S001,SKU-1018,Glazed Ceramic Planter - Ochre,Planters,37.99,51,Active,Hand-thrown glazed ceramic planter in ochre. Diameter 20 cm.
+S001,SKU-1019,Paper Lantern Pendant - Terracotta,Lighting,37.99,18,Active,Handmade paper lantern pendant in terracotta. Diameter 45 cm.
+S001,SKU-1020,Hanging Terracotta Pot - Olive,Planters,19.99,36,Active,Hand-thrown hanging terracotta pot in olive. Diameter 14 cm.
+S001,SKU-1021,Chunky Knit Throw - Olive,Textiles,43.99,6,Active,Cotton chunky knit throw in olive. 120 x 150 cm.
+S001,SKU-1022,Soy Candle in Amber Jar - Olive,Candles,21.99,30,Active,"Natural wax soy candle in amber jar in olive. 200 g, 40 hours."
+S001,SKU-1023,Oak Wall Ledge - Olive,Shelving,32.99,39,Active,Solid oak oak wall ledge in olive. 80 x 10 cm.
+S001,SKU-1024,Wool Runner Rug - Sage,Rugs,129.99,2,Low Stock,Wool wool runner rug in sage. 70 x 240 cm.
+S001,SKU-1025,Oak Wall Ledge - Sand,Shelving,37.99,57,Active,Solid oak oak wall ledge in sand. 80 x 10 cm.
+S001,SKU-1026,Glazed Ceramic Planter - Charcoal,Planters,21.99,33,Active,Hand-thrown glazed ceramic planter in charcoal. Diameter 20 cm.
+S001,SKU-1027,Stoneware Serving Bowl - Terracotta,Kitchen & Dining,34.99,6,Active,Hand-finished stoneware serving bowl in terracotta. Diameter 26 cm.
+S001,SKU-1028,Ceramic Table Lamp - Ivory,Lighting,59.99,15,Active,"Handmade ceramic table lamp in ivory. Height 42 cm, E14 fitting."
+S001,SKU-1029,Framed Botanical Print - Charcoal,Wall Decor,39.99,9,Active,"Handmade framed botanical print in charcoal. 30 x 40 cm, oak frame."
+S001,SKU-1030,Glass Carafe Vase - Sand,Vases,24.99,21,Active,Stoneware glass carafe vase in sand. Height 28 cm.
+S001,SKU-1031,Framed Botanical Print - Indigo,Wall Decor,36.99,4,Low Stock,"Handmade framed botanical print in indigo. 30 x 40 cm, oak frame."
+S001,SKU-1032,Stoneware Serving Bowl - Natural,Kitchen & Dining,29.99,48,Active,Hand-finished stoneware serving bowl in natural. Diameter 26 cm.
+S001,SKU-1033,Minimal Wall Clock - Olive,Clocks,30.99,57,Active,Powder-coated steel minimal wall clock in olive. Diameter 30 cm.
+S001,SKU-1034,Macrame Plant Hanger - Olive,Wall Decor,23.99,0,Active,Handmade macrame plant hanger in olive. Length 90 cm.
+S001,SKU-1035,Minimal Wall Clock - Terracotta,Clocks,53.99,18,Active,Powder-coated steel minimal wall clock in terracotta. Diameter 30 cm.
+S001,SKU-1036,Macrame Plant Hanger - Sage,Wall Decor,13.99,42,Active,Handmade macrame plant hanger in sage. Length 90 cm.
+S001,SKU-1037,Wool Runner Rug - Ochre,Rugs,103.99,33,Active,Wool wool runner rug in ochre. 70 x 240 cm.
+S001,SKU-1038,Boucle Cushion Cover - Ochre,Textiles,26.99,12,Active,Cotton boucle cushion cover in ochre. 45 x 45 cm.
+S001,SKU-1039,Ceramic Bud Vase - Ivory,Vases,16.99,33,Active,Stoneware ceramic bud vase in ivory. Height 12 cm.
+S001,SKU-1040,Mango Wood Board - Ochre,Kitchen & Dining,21.99,39,Active,Hand-finished mango wood board in ochre. 40 x 20 cm.
+S001,SKU-1041,Round Rattan Mirror - Terracotta,Mirrors,57.99,48,Active,Rattan round rattan mirror in terracotta. Diameter 50 cm.
+S001,SKU-1042,Woven Wall Basket - Sand,Wall Decor,32.99,42,Active,Handmade woven wall basket in sand. Diameter 30 cm.
+S001,SKU-1043,Glass Carafe Vase - Terracotta,Vases,20.99,24,Active,Stoneware glass carafe vase in terracotta. Height 28 cm.
+S001,SKU-1044,Glass Carafe Vase - Natural,Vases,21.99,2,Low Stock,Stoneware glass carafe vase in natural. Height 28 cm.
+S001,SKU-1045,Woven Wall Basket - Ochre,Wall Decor,30.99,48,Active,Handmade woven wall basket in ochre. Diameter 30 cm.
+S001,SKU-1046,Glazed Ceramic Planter - Terracotta,Planters,21.99,27,Active,Hand-thrown glazed ceramic planter in terracotta. Diameter 20 cm.
+S001,SKU-1047,Woven Wall Basket - Charcoal,Wall Decor,18.99,51,Active,Handmade woven wall basket in charcoal. Diameter 30 cm.
+S001,SKU-1048,Framed Botanical Print - Ochre,Wall Decor,37.99,45,Active,"Handmade framed botanical print in ochre. 30 x 40 cm, oak frame."
+S001,SKU-1049,Minimal Wall Clock - Charcoal,Clocks,31.99,45,Active,Powder-coated steel minimal wall clock in charcoal. Diameter 30 cm.
+S001,SKU-1050,Glazed Ceramic Planter - Sand,Planters,21.99,12,Active,Hand-thrown glazed ceramic planter in sand. Diameter 20 cm.
+S001,SKU-1051,Seagrass Storage Basket - Terracotta,Baskets & Storage,21.99,4,Low Stock,Hand-woven seagrass storage basket in terracotta. 35 x 30 cm.
+S001,SKU-1052,Beeswax Taper Pair - Ivory,Candles,13.99,18,Active,Natural wax beeswax taper pair in ivory. Height 25 cm.
+S001,SKU-1053,Oak Wall Ledge - Indigo,Shelving,31.99,51,Active,Solid oak oak wall ledge in indigo. 80 x 10 cm.
+S001,SKU-1054,Chunky Knit Throw - Rust,Textiles,45.99,54,Active,Cotton chunky knit throw in rust. 120 x 150 cm.
+S001,SKU-1055,Glazed Ceramic Planter - Sage,Planters,20.99,4,Low Stock,Hand-thrown glazed ceramic planter in sage. Diameter 20 cm.
+S001,SKU-1056,Hanging Terracotta Pot - Ochre,Planters,15.99,51,Active,Hand-thrown hanging terracotta pot in ochre. Diameter 14 cm.
+S001,SKU-1057,Ceramic Table Lamp - Sand,Lighting,74.99,27,Active,"Handmade ceramic table lamp in sand. Height 42 cm, E14 fitting."
+S001,SKU-1058,Wool Runner Rug - Olive,Rugs,134.99,15,Active,Wool wool runner rug in olive. 70 x 240 cm.
+S001,SKU-1059,Framed Botanical Print - Ivory,Wall Decor,43.99,27,Active,"Handmade framed botanical print in ivory. 30 x 40 cm, oak frame."
+S001,SKU-1060,Boucle Cushion Cover - Sage,Textiles,18.99,33,Active,Cotton boucle cushion cover in sage. 45 x 45 cm.
+S001,SKU-1061,Round Rattan Mirror - Sand,Mirrors,50.99,57,Active,Rattan round rattan mirror in sand. Diameter 50 cm.
+S001,SKU-1062,Woven Wall Basket - Olive,Wall Decor,24.99,27,Active,Handmade woven wall basket in olive. Diameter 30 cm.
+S001,SKU-1063,Framed Botanical Print - Terracotta,Wall Decor,52.99,4,Low Stock,"Handmade framed botanical print in terracotta. 30 x 40 cm, oak frame."
+S001,SKU-1064,Ceramic Bud Vase - Rust,Vases,11.99,54,Active,Stoneware ceramic bud vase in rust. Height 12 cm.
+S001,SKU-1065,Beeswax Taper Pair - Ochre,Candles,15.99,6,Active,Natural wax beeswax taper pair in ochre. Height 25 cm.
+S001,SKU-1066,Ceramic Table Lamp - Sage,Lighting,50.99,15,Active,"Handmade ceramic table lamp in sage. Height 42 cm, E14 fitting."
+S001,SKU-1067,Beeswax Taper Pair - Sage,Candles,12.99,9,Active,Natural wax beeswax taper pair in sage. Height 25 cm.
+S001,SKU-1068,Round Rattan Mirror - Ivory,Mirrors,86.99,4,Low Stock,Rattan round rattan mirror in ivory. Diameter 50 cm.
+S001,SKU-1069,Cotton Bath Mat - Ivory,Rugs,29.99,30,Active,Wool cotton bath mat in ivory. 50 x 80 cm.
+S001,SKU-1070,Chunky Knit Throw - Charcoal,Textiles,46.99,39,Active,Cotton chunky knit throw in charcoal. 120 x 150 cm.
+S001,SKU-1071,Hanging Terracotta Pot - Terracotta,Planters,19.99,24,Active,Hand-thrown hanging terracotta pot in terracotta. Diameter 14 cm.
+S001,SKU-1072,Ceramic Table Lamp - Indigo,Lighting,76.99,57,Active,"Handmade ceramic table lamp in indigo. Height 42 cm, E14 fitting."
+S001,SKU-1073,Chunky Knit Throw - Natural,Textiles,54.99,48,Active,Cotton chunky knit throw in natural. 120 x 150 cm.
+S001,SKU-1074,Seagrass Storage Basket - Indigo,Baskets & Storage,26.99,6,Active,Hand-woven seagrass storage basket in indigo. 35 x 30 cm.
+S001,SKU-1075,Oak Wall Ledge - Terracotta,Shelving,43.99,9,Active,Solid oak oak wall ledge in terracotta. 80 x 10 cm.
+S001,SKU-1076,Woven Wall Basket - Ivory,Wall Decor,23.99,6,Active,Handmade woven wall basket in ivory. Diameter 30 cm.
+S001,SKU-1077,Wool Runner Rug - Ivory,Rugs,121.99,9,Active,Wool wool runner rug in ivory. 70 x 240 cm.
+S001,SKU-1078,Round Rattan Mirror - Indigo,Mirrors,56.99,54,Active,Rattan round rattan mirror in indigo. Diameter 50 cm.
+S001,SKU-1079,Round Rattan Mirror - Natural,Mirrors,53.99,27,Active,Rattan round rattan mirror in natural. Diameter 50 cm.
+S001,SKU-1080,Ceramic Bud Vase - Natural,Vases,13.99,57,Active,Stoneware ceramic bud vase in natural. Height 12 cm.
+S001,SKU-1081,Linen Tea Towel Set (3) - Rust,Textiles,22.99,45,Active,Cotton linen tea towel set (3) in rust. 50 x 70 cm each.
+S001,SKU-1082,Glazed Ceramic Planter - Rust,Planters,31.99,2,Low Stock,Hand-thrown glazed ceramic planter in rust. Diameter 20 cm.
+S001,SKU-1083,Cotton Bath Mat - Charcoal,Rugs,18.99,36,Active,Wool cotton bath mat in charcoal. 50 x 80 cm.
+S001,SKU-1084,Cotton Bath Mat - Indigo,Rugs,29.99,2,Low Stock,Wool cotton bath mat in indigo. 50 x 80 cm.
+S001,SKU-1085,Boucle Cushion Cover - Olive,Textiles,15.99,9,Active,Cotton boucle cushion cover in olive. 45 x 45 cm.
+S001,SKU-1086,Stoneware Serving Bowl - Sand,Kitchen & Dining,32.99,21,Active,Hand-finished stoneware serving bowl in sand. Diameter 26 cm.
+S001,SKU-1087,Minimal Wall Clock - Ochre,Clocks,31.99,39,Active,Powder-coated steel minimal wall clock in ochre. Diameter 30 cm.
+S001,SKU-1088,Ceramic Bud Vase - Terracotta,Vases,18.99,36,Active,Stoneware ceramic bud vase in terracotta. Height 12 cm.
+S001,SKU-1089,Beeswax Taper Pair - Rust,Candles,12.99,6,Active,Natural wax beeswax taper pair in rust. Height 25 cm.
+S001,SKU-1090,Stoneware Serving Bowl - Indigo,Kitchen & Dining,22.99,9,Active,Hand-finished stoneware serving bowl in indigo. Diameter 26 cm.
+S001,SKU-1091,Boucle Cushion Cover - Sand,Textiles,22.99,30,Active,Cotton boucle cushion cover in sand. 45 x 45 cm.
+S001,SKU-1092,Glass Carafe Vase - Rust,Vases,27.99,9,Active,Stoneware glass carafe vase in rust. Height 28 cm.
+S001,SKU-1093,Soy Candle in Amber Jar - Indigo,Candles,18.99,2,Low Stock,"Natural wax soy candle in amber jar in indigo. 200 g, 40 hours."
+S001,SKU-1094,Cotton Bath Mat - Terracotta,Rugs,21.99,2,Low Stock,Wool cotton bath mat in terracotta. 50 x 80 cm.
+S001,SKU-1095,Chunky Knit Throw - Indigo,Textiles,66.99,15,Active,Cotton chunky knit throw in indigo. 120 x 150 cm.
+S001,SKU-1096,Linen Tea Towel Set (3) - Olive,Textiles,20.99,6,Active,Cotton linen tea towel set (3) in olive. 50 x 70 cm each.
+S001,SKU-1097,Seagrass Storage Basket - Ochre,Baskets & Storage,27.99,48,Active,Hand-woven seagrass storage basket in ochre. 35 x 30 cm.
+S001,SKU-1098,Boucle Cushion Cover - Ivory,Textiles,26.99,36,Active,Cotton boucle cushion cover in ivory. 45 x 45 cm.
+S001,SKU-1099,Framed Botanical Print - Olive,Wall Decor,53.99,9,Active,"Handmade framed botanical print in olive. 30 x 40 cm, oak frame."
+S001,SKU-1100,Mango Wood Board - Rust,Kitchen & Dining,32.99,18,Active,Hand-finished mango wood board in rust. 40 x 20 cm.
+S001,SKU-1101,Mango Wood Board - Indigo,Kitchen & Dining,31.99,12,Active,Hand-finished mango wood board in indigo. 40 x 20 cm.
+S001,SKU-1102,Beeswax Taper Pair - Olive,Candles,14.99,0,Out of Stock,Natural wax beeswax taper pair in olive. Height 25 cm.
+S001,SKU-1103,Wool Runner Rug - Charcoal,Rugs,82.99,27,Active,Wool wool runner rug in charcoal. 70 x 240 cm.
+S001,SKU-1104,Ceramic Table Lamp - Ochre,Lighting,84.99,36,Active,"Handmade ceramic table lamp in ochre. Height 42 cm, E14 fitting."
+S001,SKU-1105,Seagrass Storage Basket - Rust,Baskets & Storage,37.99,18,Active,Hand-woven seagrass storage basket in rust. 35 x 30 cm.
+S001,SKU-1106,Minimal Wall Clock - Rust,Clocks,34.99,6,Active,Powder-coated steel minimal wall clock in rust. Diameter 30 cm.
+S001,SKU-1107,Glass Carafe Vase - Indigo,Vases,24.99,2,Low Stock,Stoneware glass carafe vase in indigo. Height 28 cm.
+S001,SKU-1108,Cotton Bath Mat - Sand,Rugs,29.99,18,Active,Wool cotton bath mat in sand. 50 x 80 cm.
+S001,SKU-1109,Oak Wall Ledge - Ivory,Shelving,27.99,39,Active,Solid oak oak wall ledge in ivory. 80 x 10 cm.
+S001,SKU-1110,Paper Lantern Pendant - Sand,Lighting,32.99,18,Active,Handmade paper lantern pendant in sand. Diameter 45 cm.
+S001,SKU-1111,Soy Candle in Amber Jar - Terracotta,Candles,16.99,15,Active,"Natural wax soy candle in amber jar in terracotta. 200 g, 40 hours."
+S001,SKU-1112,Oak Wall Ledge - Ochre,Shelving,31.99,21,Active,Solid oak oak wall ledge in ochre. 80 x 10 cm.
+S001,SKU-1113,Stoneware Serving Bowl - Sage,Kitchen & Dining,37.99,21,Active,Hand-finished stoneware serving bowl in sage. Diameter 26 cm.
+S001,SKU-1114,Hanging Terracotta Pot - Ivory,Planters,15.99,45,Active,Hand-thrown hanging terracotta pot in ivory. Diameter 14 cm.
+S001,SKU-1115,Soy Candle in Amber Jar - Natural,Candles,18.99,48,Active,"Natural wax soy candle in amber jar in natural. 200 g, 40 hours."
+S001,SKU-1116,Linen Tea Towel Set (3) - Ochre,Textiles,16.99,0,Out of Stock,Cotton linen tea towel set (3) in ochre. 50 x 70 cm each.
+S001,SKU-1117,Beeswax Taper Pair - Sand,Candles,9.99,21,Active,Natural wax beeswax taper pair in sand. Height 25 cm.
+S001,SKU-1118,Soy Candle in Amber Jar - Ochre,Candles,15.99,21,Active,"Natural wax soy candle in amber jar in ochre. 200 g, 40 hours."
+S001,SKU-1119,Ceramic Bud Vase - Charcoal,Vases,11.99,54,Active,Stoneware ceramic bud vase in charcoal. Height 12 cm.
+S001,SKU-1120,Mango Wood Board - Ivory,Kitchen & Dining,24.99,27,Active,Hand-finished mango wood board in ivory. 40 x 20 cm.
+S001,SKU-1121,Cotton Bath Mat - Rust,Rugs,23.99,45,Active,Wool cotton bath mat in rust. 50 x 80 cm.
+S001,SKU-1122,Boucle Cushion Cover - Terracotta,Textiles,16.99,51,Active,Cotton boucle cushion cover in terracotta. 45 x 45 cm.
+S001,SKU-1123,Mango Wood Board - Sand,Kitchen & Dining,20.99,2,Low Stock,Hand-finished mango wood board in sand. 40 x 20 cm.
+S001,SKU-1124,Ceramic Table Lamp - Charcoal,Lighting,80.99,0,Out of Stock,"Handmade ceramic table lamp in charcoal. Height 42 cm, E14 fitting."
+S001,SKU-1125,Glazed Ceramic Planter - Ivory,Planters,32.99,48,Active,Hand-thrown glazed ceramic planter in ivory. Diameter 20 cm.
+S001,SKU-1126,Cotton Bath Mat - Sage,Rugs,27.99,15,Active,Wool cotton bath mat in sage. 50 x 80 cm.
+S001,SKU-1127,Cotton Bath Mat - Ochre,Rugs,22.99,4,Low Stock,Wool cotton bath mat in ochre. 50 x 80 cm.
+S001,SKU-1128,Round Rattan Mirror - Sage,Mirrors,87.99,27,Active,Rattan round rattan mirror in sage. Diameter 50 cm.
+S001,SKU-1129,Wool Runner Rug - Terracotta,Rugs,113.99,6,Active,Wool wool runner rug in terracotta. 70 x 240 cm.
+S001,SKU-1130,Chunky Knit Throw - Terracotta,Textiles,60.99,24,Active,Cotton chunky knit throw in terracotta. 120 x 150 cm.
+S001,SKU-1131,Hanging Terracotta Pot - Indigo,Planters,16.99,36,Active,Hand-thrown hanging terracotta pot in indigo. Diameter 14 cm.
+S001,SKU-1132,Macrame Plant Hanger - Natural,Wall Decor,15.99,24,Active,Handmade macrame plant hanger in natural. Length 90 cm.
+S001,SKU-1133,Cotton Bath Mat - Natural,Rugs,25.99,15,Active,Wool cotton bath mat in natural. 50 x 80 cm.
+S001,SKU-1134,Ceramic Bud Vase - Sand,Vases,16.99,33,Active,Stoneware ceramic bud vase in sand. Height 12 cm.
+S001,SKU-1135,Paper Lantern Pendant - Sage,Lighting,40.99,12,Active,Handmade paper lantern pendant in sage. Diameter 45 cm.
+S001,SKU-1136,Mango Wood Board - Charcoal,Kitchen & Dining,27.99,24,Active,Hand-finished mango wood board in charcoal. 40 x 20 cm.
+S001,SKU-1137,Oak Wall Ledge - Charcoal,Shelving,32.99,0,Out of Stock,Solid oak oak wall ledge in charcoal. 80 x 10 cm.
+S001,SKU-1138,Seagrass Storage Basket - Charcoal,Baskets & Storage,26.99,15,Active,Hand-woven seagrass storage basket in charcoal. 35 x 30 cm.
+S001,SKU-1139,Soy Candle in Amber Jar - Charcoal,Candles,18.99,51,Active,"Natural wax soy candle in amber jar in charcoal. 200 g, 40 hours."
+S001,SKU-1140,Framed Botanical Print - Sand,Wall Decor,41.99,27,Active,"Handmade framed botanical print in sand. 30 x 40 cm, oak frame."
+S001,SKU-1141,Boucle Cushion Cover - Charcoal,Textiles,21.99,39,Active,Cotton boucle cushion cover in charcoal. 45 x 45 cm.
+S001,SKU-1142,Minimal Wall Clock - Sage,Clocks,45.99,45,Active,Powder-coated steel minimal wall clock in sage. Diameter 30 cm.
+S001,SKU-1143,Ceramic Table Lamp - Olive,Lighting,69.99,12,Active,"Handmade ceramic table lamp in olive. Height 42 cm, E14 fitting."
+S001,SKU-1144,Hanging Terracotta Pot - Rust,Planters,18.99,24,Active,Hand-thrown hanging terracotta pot in rust. Diameter 14 cm.
+S001,SKU-1145,Wool Runner Rug - Rust,Rugs,105.99,57,Active,Wool wool runner rug in rust. 70 x 240 cm.
+S001,SKU-1146,Hanging Terracotta Pot - Sand,Planters,17.99,4,Low Stock,Hand-thrown hanging terracotta pot in sand. Diameter 14 cm.
+S001,SKU-1147,Minimal Wall Clock - Sand,Clocks,49.99,18,Active,Powder-coated steel minimal wall clock in sand. Diameter 30 cm.
+S001,SKU-1148,Glazed Ceramic Planter - Indigo,Planters,36.99,18,Active,Hand-thrown glazed ceramic planter in indigo. Diameter 20 cm.
+S001,SKU-1149,Glass Carafe Vase - Charcoal,Vases,31.99,9,Active,Stoneware glass carafe vase in charcoal. Height 28 cm.
+S001,SKU-1150,Framed Botanical Print - Rust,Wall Decor,22.99,18,Active,"Handmade framed botanical print in rust. 30 x 40 cm, oak frame."
+S002,SKU-2001,Stoneware Serving Bowl - Charcoal,Kitchen & Dining,25.99,27,Active,Hand-finished stoneware serving bowl in charcoal. Diameter 26 cm.
+S002,SKU-2002,Mango Wood Board - Terracotta,Kitchen & Dining,22.99,48,Active,Hand-finished mango wood board in terracotta. 40 x 20 cm.
+S002,SKU-2003,Stoneware Serving Bowl - Terracotta,Kitchen & Dining,22.99,9,Active,Hand-finished stoneware serving bowl in terracotta. Diameter 26 cm.
+S002,SKU-2004,Hanging Terracotta Pot - Natural,Planters,13.99,9,Active,Hand-thrown hanging terracotta pot in natural. Diameter 14 cm.
+S002,SKU-2005,Ceramic Bud Vase - Terracotta,Vases,19.99,4,Low Stock,Stoneware ceramic bud vase in terracotta. Height 12 cm.
+S002,SKU-2006,Ceramic Bud Vase - Sage,Vases,16.99,27,Active,Stoneware ceramic bud vase in sage. Height 12 cm.
+S002,SKU-2007,Glazed Ceramic Planter - Ivory,Planters,33.99,36,Active,Hand-thrown glazed ceramic planter in ivory. Diameter 20 cm.
+S002,SKU-2008,Glass Carafe Vase - Rust,Vases,18.99,36,Active,Stoneware glass carafe vase in rust. Height 28 cm.
+S002,SKU-2009,Ceramic Bud Vase - Rust,Vases,16.99,51,Active,Stoneware ceramic bud vase in rust. Height 12 cm.
+S002,SKU-2010,Mango Wood Board - Rust,Kitchen & Dining,32.99,0,Out of Stock,Hand-finished mango wood board in rust. 40 x 20 cm.
+S002,SKU-2011,Glazed Ceramic Planter - Charcoal,Planters,40.99,51,Active,Hand-thrown glazed ceramic planter in charcoal. Diameter 20 cm.
+S002,SKU-2012,Hanging Terracotta Pot - Sand,Planters,15.99,0,Out of Stock,Hand-thrown hanging terracotta pot in sand. Diameter 14 cm.
+S002,SKU-2013,Mango Wood Board - Ivory,Kitchen & Dining,32.99,24,Active,Hand-finished mango wood board in ivory. 40 x 20 cm.
+S002,SKU-2014,Mango Wood Board - Olive,Kitchen & Dining,29.99,36,Active,Hand-finished mango wood board in olive. 40 x 20 cm.
+S002,SKU-2015,Hanging Terracotta Pot - Terracotta,Planters,16.99,48,Active,Hand-thrown hanging terracotta pot in terracotta. Diameter 14 cm.
+S002,SKU-2016,Mango Wood Board - Sage,Kitchen & Dining,30.99,18,Active,Hand-finished mango wood board in sage. 40 x 20 cm.
+S002,SKU-2017,Ceramic Bud Vase - Ochre,Vases,17.99,21,Active,Stoneware ceramic bud vase in ochre. Height 12 cm.
+S002,SKU-2018,Glazed Ceramic Planter - Terracotta,Planters,30.99,0,Out of Stock,Hand-thrown glazed ceramic planter in terracotta. Diameter 20 cm.
+S002,SKU-2019,Stoneware Serving Bowl - Indigo,Kitchen & Dining,28.99,33,Active,Hand-finished stoneware serving bowl in indigo. Diameter 26 cm.
+S002,SKU-2020,Glass Carafe Vase - Charcoal,Vases,29.99,39,Active,Stoneware glass carafe vase in charcoal. Height 28 cm.
+S002,SKU-2021,Mango Wood Board - Charcoal,Kitchen & Dining,32.99,54,Active,Hand-finished mango wood board in charcoal. 40 x 20 cm.
+S002,SKU-2022,Stoneware Serving Bowl - Natural,Kitchen & Dining,31.99,33,Active,Hand-finished stoneware serving bowl in natural. Diameter 26 cm.
+S002,SKU-2023,Glazed Ceramic Planter - Rust,Planters,34.99,0,Out of Stock,Hand-thrown glazed ceramic planter in rust. Diameter 20 cm.
+S002,SKU-2024,Glass Carafe Vase - Ivory,Vases,18.99,36,Active,Stoneware glass carafe vase in ivory. Height 28 cm.
+S002,SKU-2025,Glass Carafe Vase - Olive,Vases,19.99,39,Active,Stoneware glass carafe vase in olive. Height 28 cm.
+S002,SKU-2026,Glass Carafe Vase - Natural,Vases,20.99,21,Active,Stoneware glass carafe vase in natural. Height 28 cm.
+S002,SKU-2027,Glass Carafe Vase - Indigo,Vases,23.99,15,Active,Stoneware glass carafe vase in indigo. Height 28 cm.
+S002,SKU-2028,Glazed Ceramic Planter - Sage,Planters,30.99,27,Active,Hand-thrown glazed ceramic planter in sage. Diameter 20 cm.
+S002,SKU-2029,Hanging Terracotta Pot - Rust,Planters,19.99,33,Active,Hand-thrown hanging terracotta pot in rust. Diameter 14 cm.
+S002,SKU-2030,Mango Wood Board - Indigo,Kitchen & Dining,21.99,36,Active,Hand-finished mango wood board in indigo. 40 x 20 cm.
