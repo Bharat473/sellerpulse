@@ -1,0 +1,450 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>SellerPulse Question Trace</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@600;700&display=swap">
+<style>
+/* Layout: control bar + step panel beside a scrollable sequence diagram; stacks to one column on narrow screens. */
+:root {
+  --bg: #f5f6f8;
+  --surface: #ffffff;
+  --ink: #1c2330;
+  --muted: #5d6778;
+  --line: #d9dee6;
+  --ghost: #c9cfd9;
+  --startup: #7a8496;
+  --retrieve: #2f6fd6;
+  --answer: #0f8f7e;
+  --warn: #b7791f;
+  --warn-bg: #fbf3e4;
+  --bad: #c2413b;
+  --code-bg: #eef1f6;
+  --kind-person: #e8ecf3;
+  --kind-ui: #e5ecf8;
+  --kind-code: #e6eefc;
+  --kind-store: #f6efe2;
+  --kind-model: #e3f3f0;
+  --f-display: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+  --f-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12161d; --surface: #1a2029; --ink: #e6eaf0; --muted: #9aa4b4; --line: #2d3542; --ghost: #333c4a;
+    --startup: #97a1b2; --retrieve: #6ea0f0; --answer: #3cc3ae; --warn: #e2a84a; --warn-bg: #2b2418; --bad: #ef7a73;
+    --code-bg: #222a35; --kind-person: #232a35; --kind-ui: #1f2a3b; --kind-code: #1e2a40; --kind-store: #2e2a20; --kind-model: #1b302d;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12161d; --surface: #1a2029; --ink: #e6eaf0; --muted: #9aa4b4; --line: #2d3542; --ghost: #333c4a;
+  --startup: #97a1b2; --retrieve: #6ea0f0; --answer: #3cc3ae; --warn: #e2a84a; --warn-bg: #2b2418; --bad: #ef7a73;
+  --code-bg: #222a35; --kind-person: #232a35; --kind-ui: #1f2a3b; --kind-code: #1e2a40; --kind-store: #2e2a20; --kind-model: #1b302d;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.5; }
+.wrap { max-width: 1440px; margin: 0 auto; padding-inline: 16px; padding-block: 20px 40px; display: grid; gap: 16px; }
+header h1 { font-family: var(--f-display); font-weight: 700; font-size: clamp(1.5rem, 3vw, 2rem); letter-spacing: .01em; margin: 0; text-wrap: balance; }
+header p { margin: 4px 0 0; color: var(--muted); max-width: 70ch; }
+.question { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+.question .who { font-family: var(--f-display); font-weight: 600; text-transform: uppercase; letter-spacing: .08em; font-size: .75rem; color: var(--muted); }
+.question q { font-size: 1.05rem; font-weight: 500; quotes: "\201C" "\201D"; }
+.question .meta { margin-left: auto; font-family: var(--f-mono); font-size: .78rem; color: var(--muted); }
+
+.controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.btn { font: 500 .9rem var(--f-body); color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 8px 14px; cursor: pointer; }
+.btn:hover { border-color: var(--muted); }
+.btn:focus-visible, .chip:focus-visible { outline: 2px solid var(--retrieve); outline-offset: 2px; }
+.btn.primary { background: var(--ink); color: var(--bg); border-color: var(--ink); min-width: 92px; }
+.counter { font-family: var(--f-mono); font-size: .85rem; color: var(--muted); font-variant-numeric: tabular-nums; margin-left: 4px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font: 500 .78rem var(--f-mono); width: 32px; height: 28px; border-radius: 6px; border: 1px solid var(--line); background: var(--surface); color: var(--muted); cursor: pointer; font-variant-numeric: tabular-nums; }
+.chip[data-phase="startup"].done { border-color: var(--startup); color: var(--startup); }
+.chip[data-phase="retrieve"].done { border-color: var(--retrieve); color: var(--retrieve); }
+.chip[data-phase="answer"].done { border-color: var(--answer); color: var(--answer); }
+.chip.current { color: var(--bg) !important; }
+.chip.current[data-phase="startup"] { background: var(--startup); border-color: var(--startup); }
+.chip.current[data-phase="retrieve"] { background: var(--retrieve); border-color: var(--retrieve); }
+.chip.current[data-phase="answer"] { background: var(--answer); border-color: var(--answer); }
+.chip.vary::after { content: ""; display: block; width: 5px; height: 5px; border-radius: 50%; background: var(--warn); margin: -2px auto 0; }
+
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: .8rem; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 18px; height: 3px; border-radius: 2px; display: inline-block; }
+
+.main { display: grid; grid-template-columns: minmax(0, 1fr) 420px; gap: 16px; align-items: start; }
+.diagram { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow-x: auto; min-width: 0; }
+.diagram svg { display: block; width: 100%; min-width: 900px; height: auto; }
+.panel { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px; display: grid; gap: 14px; min-width: 0; max-height: calc(100vh - 24px); overflow-y: auto; }
+.eyebrow { font-family: var(--f-display); font-weight: 600; text-transform: uppercase; letter-spacing: .1em; font-size: .72rem; display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
+.eyebrow .ph { padding: 2px 8px; border-radius: 4px; color: var(--bg); white-space: nowrap; }
+.eyebrow .num { color: var(--muted); font-family: var(--f-mono); letter-spacing: 0; text-transform: none; font-weight: 500; }
+.panel h2 { font-family: var(--f-display); font-weight: 700; font-size: 1.35rem; margin: 0; line-height: 1.2; text-wrap: balance; }
+.panel p { margin: 0; }
+.label { font-family: var(--f-display); font-weight: 600; text-transform: uppercase; letter-spacing: .08em; font-size: .7rem; color: var(--muted); margin-bottom: 6px; display: flex; justify-content: space-between; gap: 8px; }
+.label em { font-style: normal; font-family: var(--f-mono); letter-spacing: 0; text-transform: none; font-weight: 400; }
+pre { margin: 0; background: var(--code-bg); border-radius: 8px; padding: 10px 12px; font: .78rem/1.55 var(--f-mono); white-space: pre-wrap; word-break: break-word; overflow-x: auto; }
+.callout { background: var(--warn-bg); border-left: 3px solid var(--warn); border-radius: 6px; padding: 10px 12px; font-size: .88rem; }
+.callout strong { color: var(--warn); }
+.bad { color: var(--bad); font-weight: 600; }
+
+svg text { font-family: var(--f-body); }
+.p-box { stroke: var(--line); }
+.p-name { font: 600 12.5px var(--f-body); fill: var(--ink); }
+.p-kind { font: 500 9.5px var(--f-mono); fill: var(--muted); letter-spacing: .04em; text-transform: uppercase; }
+.lifeline { stroke: var(--line); stroke-dasharray: 3 4; }
+.band-label { font: 600 10px var(--f-display); letter-spacing: .12em; fill: var(--muted); text-transform: uppercase; }
+.band-rule { stroke: var(--line); }
+.msg { cursor: pointer; }
+.msg line, .msg path { fill: none; stroke-width: 1.4; }
+.msg text.lbl { font-size: 11.5px; fill: var(--muted); }
+.msg .badge circle { stroke: none; }
+.msg .badge text { font: 600 9.5px var(--f-mono); fill: var(--bg); }
+.msg.future { opacity: .22; }
+.msg.past { opacity: .6; }
+.msg.current text.lbl { fill: var(--ink); font-weight: 600; }
+.msg.current line, .msg.current path { stroke-width: 2.4; }
+.msg.current .draw { stroke-dasharray: var(--len); stroke-dashoffset: var(--len); animation: draw .55s ease-out forwards; }
+.hit { stroke: transparent !important; stroke-width: 18 !important; }
+.rowhl { fill: var(--code-bg); }
+.vary-tag rect { fill: var(--warn-bg); stroke: var(--warn); }
+.vary-tag text { font: 600 9.5px var(--f-mono); fill: var(--warn); }
+.packet { transition: none; }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+@media (prefers-reduced-motion: reduce) { .msg.current .draw { animation: none; stroke-dashoffset: 0; } }
+
+@media (max-width: 1100px) {
+  .main { grid-template-columns: minmax(0, 1fr); }
+  .panel { position: static; max-height: none; order: -1; }
+}
+@media (max-width: 520px) {
+  .question .meta { margin-left: 0; }
+  .panel { padding: 14px; }
+}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>SellerPulse Question Trace</h1>
+    <p>One real question from <code>simple/sellerpulse.py</code>, followed through every function call. Step through it, or press Play.</p>
+  </header>
+
+  <div class="question">
+    <span class="who">Meera asks</span>
+    <q>Why is my Boho Wall Hanging listing underperforming?</q>
+    <span class="meta">seller S001 · k = 3 · gpt-oss-120b · temperature 0</span>
+  </div>
+
+  <div class="controls" role="group" aria-label="Step controls">
+    <button class="btn" id="prev" type="button">← Back</button>
+    <button class="btn primary" id="play" type="button">▶ Play</button>
+    <button class="btn" id="next" type="button">Next →</button>
+    <button class="btn" id="restart" type="button">Restart</button>
+    <span class="counter" id="counter">Step 1 / 19</span>
+  </div>
+  <div class="chips" id="chips" aria-label="Jump to step"></div>
+  <div class="legend">
+    <span><i style="background:var(--startup)"></i>Startup (runs once)</span>
+    <span><i style="background:var(--retrieve)"></i>Find the documents</span>
+    <span><i style="background:var(--answer)"></i>Write the answer</span>
+    <span><i style="background:var(--warn);height:6px;width:6px;border-radius:50%"></i>Where answers can vary</span>
+    <span>Use ← → keys, or click any arrow</span>
+  </div>
+
+  <div class="main">
+    <div class="diagram" id="diagram"></div>
+    <aside class="panel" id="panel" aria-live="polite"></aside>
+  </div>
+</div>
+
+<script>
+const P = [
+  { id: "M",  name: "Meera",        kind: "person",      fill: "--kind-person" },
+  { id: "UI", name: "Gradio / terminal", kind: "interface", fill: "--kind-ui" },
+  { id: "A",  name: "answer()",     kind: "our code",    fill: "--kind-code" },
+  { id: "R",  name: "retrieve()",   kind: "our code",    fill: "--kind-code" },
+  { id: "F",  name: "find_sku()",   kind: "our code",    fill: "--kind-code" },
+  { id: "C",  name: "Chroma",       kind: "vector store", fill: "--kind-store" },
+  { id: "E",  name: "bge-small",    kind: "embedder",    fill: "--kind-model" },
+  { id: "G",  name: "Groq LLM",     kind: "gpt-oss-120b", fill: "--kind-model" },
+];
+
+const SHOP_DATA = `[review-REV-1024] Review REV-1024 of "Boho Wall Hanging - Macrame" (SKU-1001), 3 stars, 2026-08-08:
+It's okay, the finish is a bit uneven.
+
+[review-REV-1002] Review REV-1002 of "Boho Wall Hanging - Macrame" (SKU-1001), 3 stars, 2026-08-08:
+Decent, but smaller than expected.
+
+[review-REV-1028] Review REV-1028 of "Boho Wall Hanging - Macrame" (SKU-1001), 3 stars, 2026-08-10:
+Decent, but smaller than expected.`;
+
+const ANSWER = `**Likely cause:** Buyers perceive the product as lower-quality and not matching expectations, leading to only 3-star ratings and reduced sales.
+
+**Evidence:**
+- Two reviews note the finish is "a bit uneven" 【review-REV-1024】.
+- Three reviews say the hanging is "smaller than expected" 【review-REV-1002】【review-REV-1028】.
+
+**Fix:** Update the listing to clearly state the exact dimensions and include close-up photos that show the finish, so shoppers know exactly what size and quality to expect before purchasing.`;
+
+const S = [
+  { f: "UI", t: "UI", ph: "startup", lbl: "load_documents()", title: "Read the data and make 288 documents",
+    say: "When the file starts, it reads the listings and reviews spreadsheets and the policy text. Each listing, each review and each policy section becomes one document: a header line plus the text, with labels attached.",
+    sec: "Section 2 · Load data", code: `DOCS, LISTINGS = load_documents()`,
+    dlabel: "What it produces", data: `180 listings + 102 reviews + 6 policy sections = 288 documents
+
+Example document (id review-REV-1024, seller S001, sku SKU-1001):
+Review REV-1024 of "Boho Wall Hanging - Macrame" (SKU-1001), 3 stars, 2026-08-08:
+It's okay, the finish is a bit uneven.` },
+  { f: "UI", t: "E", ph: "startup", lbl: "send 288 document texts", title: "Send every document to the embedder",
+    say: "build_store() hands all 288 texts to bge-small, a small model that runs on your Mac. Its only job is to turn text into numbers that capture meaning.",
+    sec: "Section 3 · Embed", code: `STORE = build_store(DOCS)
+embeddings = HuggingFaceEmbeddings(model_name=EMBED_MODEL,
+                                   encode_kwargs={"normalize_embeddings": True})`,
+    dlabel: "Going in", data: `288 texts, one per document` },
+  { f: "E", t: "C", ph: "startup", ret: true, lbl: "288 vectors stored", title: "Store 288 vectors in Chroma",
+    say: "Each document comes back as a list of 384 numbers (a vector): its position on a 'meaning map'. Chroma keeps all 288 vectors in memory, together with the text and the labels (seller, SKU, type).",
+    sec: "Section 3 · Embed", code: `Chroma.from_documents(docs, embeddings, collection_name="sellerpulse_simple",
+                      collection_metadata={"hnsw:space": "cosine"})`,
+    dlabel: "What Chroma now holds", data: `288 rows × 384 numbers each
+review-REV-1024 → [0.021, -0.113, 0.087, … 384 numbers]   (illustrative values)
+labels kept: id, type, seller_id, sku` },
+  { f: "UI", t: "G", ph: "startup", lbl: "connect, temperature 0", title: "Set up the Groq connection",
+    say: "The file prepares the connection to Groq's servers, where gpt-oss-120b runs. Temperature 0 asks the model to always pick its most likely next word. Nothing is sent yet.",
+    sec: "Section 1 · Settings", code: `LLM = ChatGroq(model=MODEL, api_key=os.getenv("GROQ_API_KEY"), temperature=0)`,
+    dlabel: "Terminal shows", data: `Ready: 288 documents embedded.` },
+
+  { f: "M", t: "UI", ph: "retrieve", lbl: "types the question", title: "Meera asks her question",
+    say: "Everything above happened once. From here on, these steps repeat for every question.",
+    sec: "Section 6 · Run", code: `gr.ChatInterface(fn=lambda message, history: answer(message), ...)
+# terminal mode:  print(answer(question))`,
+    dlabel: "Input", data: `"Why is my Boho Wall Hanging listing underperforming?"` },
+  { f: "UI", t: "A", ph: "retrieve", lbl: "answer(question)", title: "Hand the question to answer()",
+    say: "answer() is the coordinator. It does no specialist work itself: it asks retrieve() for documents, packs them up, sends them to Groq and returns the reply.",
+    sec: "Section 5 · Answer", code: `def answer(question):
+    if not question.strip():
+        return "Please enter a question."`,
+    dlabel: "Check", data: `Question is not empty → continue` },
+  { f: "A", t: "R", ph: "retrieve", lbl: "retrieve(question)", title: "Ask retrieve() for the right documents",
+    say: "answer() needs the few documents that best match the question, from Meera's shop only.",
+    sec: "Section 5 · Answer", code: `hits = retrieve(question)`,
+    dlabel: "Passed along", data: `"Why is my Boho Wall Hanging listing underperforming?"` },
+  { f: "R", t: "F", ph: "retrieve", lbl: "find_sku(question)", title: "Which product is she asking about?",
+    say: "Before searching, retrieve() checks whether the question names one of Meera's products, so it can search only that product's documents.",
+    sec: "Section 4 · Retrieve", code: `mine = LISTINGS[LISTINGS.seller_id == SELLER_ID]
+matches = [r.sku for r in mine.itertuples()
+           if r.title.split(" - ")[0].lower() in q]`,
+    dlabel: "What it checks", data: `Meera's 150 listings, short names only:
+"boho wall hanging"  → found in the question ✓
+"ceramic table vase" → not found
+… 148 more, none found` },
+  { f: "F", t: "R", ph: "retrieve", ret: true, lbl: "SKU-1001", title: "Exactly one match: SKU-1001",
+    say: "One listing matched, so the product is known. If none or several had matched, it would return nothing and the search would cover her whole shop plus the policy.",
+    sec: "Section 4 · Retrieve", code: `return matches[0] if len(matches) == 1 else None`,
+    dlabel: "Returned", data: `"SKU-1001"  (Boho Wall Hanging - Macrame)` },
+  { f: "R", t: "C", ph: "retrieve", lbl: "search, k=3, filter S001 + SKU-1001", title: "Search Chroma with a filter",
+    say: "The filter is the privacy wall: only documents labelled seller S001 and SKU-1001 can come back. That leaves 8 of the 288 documents: the Boho listing and its 7 reviews.",
+    sec: "Section 4 · Retrieve", code: `where = {"$and": [{"seller_id": SELLER_ID}, {"sku": sku}]}
+return STORE.similarity_search_with_score(question, k=K, filter=where)`,
+    dlabel: "The filter in action", data: `288 documents
+ → seller_id = S001 and sku = SKU-1001
+ → 8 candidates:
+   listing-SKU-1001
+   review-REV-1002  review-REV-1024  review-REV-1028  review-REV-1032
+   review-REV-1030  review-REV-501   review-REV-504` },
+  { f: "C", t: "E", ph: "retrieve", lbl: "embed the question", title: "Turn the question into numbers too",
+    say: "To compare the question with the documents, Chroma has bge-small place the question on the same meaning map.",
+    sec: "Inside the Chroma library", code: `# no code of ours here: Chroma calls the same bge-small model`,
+    dlabel: "Going in", data: `"Why is my Boho Wall Hanging listing underperforming?"` },
+  { f: "E", t: "C", ph: "retrieve", ret: true, lbl: "question vector", title: "The question's position on the map",
+    say: "Same model, same 384 numbers per text. That is why the embedding settings must never differ between building the store and searching it.",
+    sec: "Inside the Chroma library", code: `# question → 384 numbers`,
+    dlabel: "Returned", data: `[0.034, -0.090, 0.112, … 384 numbers]   (illustrative values)` },
+  { f: "C", t: "R", ph: "retrieve", ret: true, vary: "Near-tied distances", lbl: "3 closest + distances", title: "The 3 closest documents",
+    say: "Chroma measures how far each of the 8 candidates sits from the question and returns the 3 nearest. Lower distance means closer meaning.",
+    sec: "Section 4 · Retrieve", code: `STORE.similarity_search_with_score(...)  # returns (document, distance) pairs`,
+    dlabel: "Your real run", data: `1. review-REV-1024   distance 0.248   "finish is a bit uneven"
+2. review-REV-1002   distance 0.251   "smaller than expected"
+3. review-REV-1028   distance 0.253   "smaller than expected"`,
+    warn: "The three distances differ by only 0.005. Tiny changes (a different date format, a rebuilt index) can swap their order. In your older build the order was 1024, 1028, 1002. The same three documents still came back, so this alone does not explain different answers." },
+  { f: "R", t: "A", ph: "retrieve", ret: true, lbl: "hits", title: "Back to answer() with the documents",
+    say: "retrieve() hands the 3 documents and their distances back to the coordinator.",
+    sec: "Section 5 · Answer", code: `hits = retrieve(question)   # 3 (document, distance) pairs`,
+    dlabel: "Returned", data: `[(review-REV-1024, 0.248), (review-REV-1002, 0.251), (review-REV-1028, 0.253)]` },
+
+  { f: "A", t: "A", ph: "answer", lbl: "build Shop data, print IDs", title: "Pack the documents into the Shop data block",
+    say: "Each document gets its [ID] tag in front, and they are stacked with a blank line between. The IDs are what the model is told to cite. The terminal also prints which documents were used.",
+    sec: "Section 5 · Answer", code: `shop_data = "\\n\\n".join(f"[{doc.metadata['id']}] {doc.page_content}" for doc, _ in hits)
+print("Retrieved:", ...)`,
+    dlabel: "Shop data block", data: SHOP_DATA + `
+
+Terminal prints:
+Retrieved: review-REV-1024 (0.248), review-REV-1002 (0.251), review-REV-1028 (0.253)` },
+  { f: "A", t: "G", ph: "answer", lbl: "system prompt + Shop data + question", title: "Send everything to Groq",
+    say: "Two messages travel over the internet to Groq: the system message (who SellerPulse is, plus 6 rules) and the human message (Shop data, then the question). This is everything the model knows about Meera's shop.",
+    sec: "Section 5 · Answer", code: `messages = [("system", SYSTEM_PROMPT),
+            ("human", f"Shop data:\\n{shop_data}\\n\\nQuestion: {question}")]
+LLM.invoke(messages)`,
+    dlabel: "Message 2 of 2 (the human message)", data: `Shop data:
+` + SHOP_DATA + `
+
+Question: Why is my Boho Wall Hanging listing underperforming?` },
+  { f: "G", t: "A", ph: "answer", ret: true, vary: "Same input, different words", lbl: "answer text", title: "Groq writes the reply",
+    say: "The model reads both messages and writes an answer word by word. This is the step where your two runs differed, even though the documents it received were the same.",
+    sec: "Section 5 · Answer", code: `LLM.invoke(messages).content`,
+    dlabel: "Your real run", data: ANSWER,
+    warn: "Check it against the Shop data: \"Two reviews … uneven\" is wrong (only REV-1024 says it). \"Three reviews … smaller\" is wrong (only REV-1002 and REV-1028). \"reduced sales\" has no source: it has no sales data. Rule 1 says never state a figure that is not in the Shop data, yet it still happened. Temperature 0 makes the model prefer its most likely words, but on Groq it does not guarantee identical output every time." },
+  { f: "A", t: "UI", ph: "answer", ret: true, lbl: "answer text", title: "answer() returns the text",
+    say: "The coordinator's job is done. It returns the reply to whoever called it.",
+    sec: "Section 5 · Answer", code: `return LLM.invoke(messages).content`,
+    dlabel: "Returned", data: `The answer text from step 17` },
+  { f: "UI", t: "M", ph: "answer", ret: true, lbl: "chat bubble", title: "Meera sees the diagnosis",
+    say: "Gradio shows the reply as a chat bubble (or the terminal prints it). One question took 19 steps, and only steps 13 and 17 can make the result change between runs.",
+    sec: "Section 6 · Run", code: `gr.ChatInterface(...).launch()`,
+    dlabel: "Next: Gate 3", data: `Run the same question 5 times and compare:
+uv run python simple/sellerpulse.py --repeat 5 "Why is my Boho Wall Hanging listing underperforming?"
+
+If "Retrieved:" stays the same but the answers change → the variation comes from step 17 (the LLM).
+If "Retrieved:" changes → step 13 (retrieval) is involved too.` },
+];
+
+const W = 960, COLW = W / P.length, TOP = 78, ROW = 38, H = TOP + S.length * ROW + 52;
+const X = id => COLW * P.findIndex(p => p.id === id) + COLW / 2;
+const PH = { startup: "--startup", retrieve: "--retrieve", answer: "--answer" };
+const svgNS = "http://www.w3.org/2000/svg";
+const el = (tag, attrs = {}, parent) => { const e = document.createElementNS(svgNS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
+
+const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "Sequence diagram of one SellerPulse question" });
+document.getElementById("diagram").appendChild(svg);
+const rowHL = el("rect", { class: "rowhl", x: 0, width: W, height: ROW, rx: 0 }, svg);
+
+P.forEach((p, i) => {
+  const cx = i * COLW + COLW / 2;
+  el("line", { class: "lifeline", x1: cx, y1: 62, x2: cx, y2: H - 12 }, svg);
+  el("rect", { class: "p-box", x: i * COLW + 7, y: 12, width: COLW - 14, height: 46, rx: 8, fill: `var(${p.fill})` }, svg);
+  const n = el("text", { class: "p-name", x: cx, y: 32, "text-anchor": "middle" }, svg); n.textContent = p.name;
+  const k = el("text", { class: "p-kind", x: cx, y: 48, "text-anchor": "middle" }, svg); k.textContent = p.kind;
+});
+
+const bands = [[0, "Startup · runs once"], [4, "Every question"]];
+bands.forEach(([i, txt]) => {
+  const y = TOP + i * ROW - 4;
+  el("line", { class: "band-rule", x1: 8, x2: W - 8, y1: y, y2: y }, svg);
+  const t = el("text", { class: "band-label", x: W - 12, y: y + 12, "text-anchor": "end" }, svg); t.textContent = txt;
+});
+
+const msgs = S.map((s, i) => {
+  const y = TOP + i * ROW + 24;
+  const g = el("g", { class: "msg future", tabindex: -1 }, svg);
+  const color = `var(${PH[s.ph]})`;
+  const x1 = X(s.f), x2 = X(s.t);
+  let shape, hit, len;
+  if (s.f === s.t) {
+    const d = `M ${x1} ${y - 8} h 34 v 14 h -32`;
+    shape = el("path", { d, class: "draw", stroke: color }, g);
+    hit = el("path", { d, class: "hit" }, g);
+    len = 82;
+    el("path", { d: `M ${x1 + 8} ${y + 2} l -6 4 l 6 4`, stroke: color, fill: "none", "stroke-width": 1.6 }, g);
+  } else {
+    const dir = x2 > x1 ? 1 : -1;
+    const ax = x2 - dir * 4;
+    shape = el("line", { x1, y1: y, x2: ax, y2: y, class: "draw", stroke: color, "stroke-dasharray": s.ret ? "5 4" : null }, g);
+    if (!s.ret) shape.removeAttribute("stroke-dasharray");
+    hit = el("line", { x1, y1: y, x2, y2: y, class: "hit" }, g);
+    el("path", { d: `M ${ax - dir * 8} ${y - 5} L ${ax} ${y} L ${ax - dir * 8} ${y + 5}`, fill: "none", stroke: color, "stroke-width": 1.6 }, g);
+    len = Math.abs(ax - x1);
+  }
+  g.style.setProperty("--len", len);
+  const lx = s.f === s.t ? x1 + 42 : (x1 + x2) / 2;
+  const lbl = el("text", { class: "lbl", x: lx, y: y - 7, "text-anchor": s.f === s.t ? "start" : "middle" }, g);
+  lbl.textContent = s.lbl;
+  const bx = x1 + (s.f === s.t ? -14 : (x2 > x1 ? -14 : 14));
+  const badge = el("g", { class: "badge" }, g);
+  el("circle", { cx: bx, cy: y, r: 9, fill: color }, badge);
+  const bt = el("text", { x: bx, y: y + 3.3, "text-anchor": "middle" }, badge); bt.textContent = i + 1;
+  if (s.vary) {
+    const tag = el("g", { class: "vary-tag" }, g);
+    const tw = s.vary.length * 6.1 + 14;
+    const tx = (x1 + x2) / 2 - tw / 2;
+    el("rect", { x: tx, y: y + 4, width: tw, height: 16, rx: 4 }, tag);
+    const tt = el("text", { x: tx + 7, y: y + 15.5 }, tag); tt.textContent = s.vary;
+  }
+  g.addEventListener("click", () => go(i));
+  return g;
+});
+
+const chips = document.getElementById("chips");
+const chipEls = S.map((s, i) => {
+  const b = document.createElement("button");
+  b.type = "button"; b.className = "chip" + (s.vary ? " vary" : ""); b.dataset.phase = s.ph;
+  b.textContent = i + 1; b.setAttribute("aria-label", `Step ${i + 1}: ${s.title}`);
+  b.addEventListener("click", () => go(i));
+  chips.appendChild(b); return b;
+});
+
+const panel = document.getElementById("panel");
+const PHNAME = { startup: "Startup", retrieve: "Find the documents", answer: "Write the answer" };
+function renderPanel(i) {
+  const s = S[i];
+  panel.innerHTML = "";
+  const eb = document.createElement("div"); eb.className = "eyebrow";
+  const ph = document.createElement("span"); ph.className = "ph"; ph.style.background = `var(${PH[s.ph]})`; ph.textContent = PHNAME[s.ph];
+  const num = document.createElement("span"); num.className = "num";
+  const from = P.find(p => p.id === s.f).name, to = P.find(p => p.id === s.t).name;
+  num.textContent = `Step ${i + 1} · ${from}${s.f === s.t ? "" : " → " + to}`;
+  eb.append(ph, num);
+  const h = document.createElement("h2"); h.textContent = s.title;
+  const p = document.createElement("p"); p.textContent = s.say;
+  panel.append(eb, h, p);
+  const block = (label, sub, text) => {
+    const wrap = document.createElement("div");
+    const l = document.createElement("div"); l.className = "label";
+    const a = document.createElement("span"); a.textContent = label; l.appendChild(a);
+    if (sub) { const e = document.createElement("em"); e.textContent = sub; l.appendChild(e); }
+    const pre = document.createElement("pre"); pre.textContent = text;
+    wrap.append(l, pre); return wrap;
+  };
+  panel.append(block("In the code", s.sec, s.code));
+  panel.append(block(s.dlabel, "", s.data));
+  if (s.warn) {
+    const c = document.createElement("div"); c.className = "callout";
+    const st = document.createElement("strong"); st.textContent = "Where answers can vary. ";
+    c.append(st, document.createTextNode(s.warn)); panel.append(c);
+  }
+}
+
+let cur = 0, timer = null;
+function go(i) {
+  cur = Math.max(0, Math.min(S.length - 1, i));
+  msgs.forEach((g, k) => {
+    g.classList.remove("future", "past", "current");
+    g.classList.add(k < cur ? "past" : k === cur ? "current" : "future");
+  });
+  const cg = msgs[cur]; const parentEl = cg.parentNode; parentEl.removeChild(cg); parentEl.appendChild(cg);
+  rowHL.setAttribute("y", TOP + cur * ROW + 24 - ROW / 2 - 2);
+  chipEls.forEach((c, k) => { c.classList.toggle("current", k === cur); c.classList.toggle("done", k < cur); });
+  document.getElementById("counter").textContent = `Step ${cur + 1} / ${S.length}`;
+  renderPanel(cur);
+  const dg = document.getElementById("diagram");
+  const target = (Math.min(X(S[cur].f), X(S[cur].t)) / W) * dg.scrollWidth - 40;
+  if (dg.scrollWidth > dg.clientWidth) dg.scrollTo({ left: Math.max(0, target), behavior: "smooth" });
+}
+function play() {
+  const btn = document.getElementById("play");
+  if (timer) { clearInterval(timer); timer = null; btn.textContent = "▶ Play"; return; }
+  if (cur === S.length - 1) go(0);
+  btn.textContent = "❚❚ Pause";
+  timer = setInterval(() => { if (cur >= S.length - 1) { play(); return; } go(cur + 1); }, 3200);
+}
+document.getElementById("prev").onclick = () => go(cur - 1);
+document.getElementById("next").onclick = () => go(cur + 1);
+document.getElementById("restart").onclick = () => go(0);
+document.getElementById("play").onclick = play;
+document.addEventListener("keydown", e => {
+  if (e.key === "ArrowRight") { e.preventDefault(); go(cur + 1); }
+  if (e.key === "ArrowLeft") { e.preventDefault(); go(cur - 1); }
+});
+go(0);
+</script>
+
+</body></html>
