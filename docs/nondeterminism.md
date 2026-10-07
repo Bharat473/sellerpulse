@@ -29,3 +29,21 @@ Raw output of 5 runs: [nondeterminism-runs.md](nondeterminism-runs.md) · Flow: 
 | H2 | Duplicate review text (REV-1002 = REV-1028) inflates counts | K = 2, rerun 5× | (to do) |
 | H3 | Rule 1 too narrow: "two reviews" not seen as a figure | Covered by H1 | (to do) |
 | H4 | Model-specific | MODEL = openai/gpt-oss-20b, rerun 5× | (to do) |
+
+## H1 result (tested)
+
+Change: one line added to Rule 1 in simple/sellerpulse.py:
+"Never say how many reviews say something ("two reviews..."); name each review by its ID instead."
+Raw output: [nondeterminism-h1.md](nondeterminism-h1.md)
+
+| | Before | After H1 rule |
+|---|---|---|
+| Wrong counts | 5/5 runs | 1/5 runs (Run 4: "Two 3-star reviews note...") |
+| Names each review by ID | 0/5 | 4/5 |
+| Retrieval | identical | identical |
+| Unsupported "sales/conversion" claims | 5/5 | 5/5 |
+| New: generic "tighten quality-control checks" | – | 3/5 |
+
+Conclusion: H1 confirmed. The model writes counts because they sound like evidence, not because it counted. A prompt rule cuts the error from 5/5 to 1/5 but cannot guarantee 0 → needs a code check after the LLM (Week 3 guardrail). Runs 3 and 5 were word-for-word identical: temperature 0 gives mostly, not fully, repeatable output.
+
+Next: H2 (duplicate reviews, K = 2) and H4 (gpt-oss-20b) only if needed; next problem to target is the unsupported "sales/conversion" claims.
