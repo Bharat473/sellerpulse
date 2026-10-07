@@ -23,7 +23,7 @@ from langchain_huggingface import HuggingFaceEmbeddings
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data" / "synthetic"
 POLICY = ROOT / "corpus" / "source" / "seller_policy.md"
-MODEL = "openai/gpt-oss-120b"
+MODEL = "openai/gpt-oss-20b"
 EMBED_MODEL = "BAAI/bge-small-en-v1.5"
 K = 3  # how many documents to retrieve per question
 

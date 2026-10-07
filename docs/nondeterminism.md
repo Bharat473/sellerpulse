@@ -61,3 +61,21 @@ Raw output: [nondeterminism-experiments.md](nondeterminism-experiments.md). Scor
 | V4 reasoning low | 0 | 1 ("45 cm × 30 cm" made up) | 4/5 | 4 | rejected: invents measurements |
 
 Conclusions: H1 rule fixed wrong counts (0/25). gpt-oss-20b was fully repeatable on this question. Seed, de-duplication and low reasoning effort do not help. Lesson: automatic checks need checking too. Next: confirm 20b on more questions before switching.
+
+## Step B: 120b vs 20b on 4 questions × 5 runs (simple/compare.py)
+
+Raw output: [model-comparison.md](model-comparison.md). Automatic scores were wrong (non-breaking hyphen in "REV‑1024", curly apostrophe in "don’t", phrase "does not include"); checker fixed, table below scored by hand.
+
+| Question | 120b PASS | 20b PASS | 120b distinct | 20b distinct | Notes |
+|---|---|---|---|---|---|
+| Diagnosis | 1/5 | 5/5 | 4 | 2 | 120b adds unsupported conversion/visibility claims (4/5) |
+| Policy | 5/5 | 5/5 | 5 | 4 | both decline with correct penalty |
+| No data | 5/5 | 5/5 | 1 | 3 | both honest |
+| Draft reply | 5/5 | 5/5 | 3 | 3 | 120b run 2: "Our listings include the dimensions" (false) |
+| Total | 16/20 | 20/20 | 13 | 12 | 0 wrong counts, 0 invented measurements in 40 answers |
+
+Conclusions:
+1. Wrong counts fixed by the H1 rule across questions and models (0/40).
+2. 20b's "1 distinct answer" on the Boho question was a one-question fluke; both models give about 3 wordings per 5 runs. Meaning is stable, wording is not. Seed does not help on Groq. Identical answers need caching (Week 3).
+3. Decision: switch to gpt-oss-20b (20/20 vs 16/20, fewer unsupported claims, faster, higher free limits, Abhijit's original choice).
+4. New finding: both models write "I'll review the listing" in draft replies, a promise Meera did not ask for (Rule 3). Add to guardrails.
