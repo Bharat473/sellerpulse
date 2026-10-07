@@ -1,0 +1,649 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SellerPulse Agent Walkthrough</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@600;700&display=swap">
+<style>
+/* Layout: scenario tabs + file map on top; sequence diagram beside a sticky explanation panel; stacks on narrow screens. */
+:root {
+  --bg: #f5f6f8; --surface: #ffffff; --ink: #1c2330; --muted: #5d6778; --line: #d9dee6; --code-bg: #eef1f6;
+  --startup: #7a8496; --guard: #b4492f; --retrieve: #2f6fd6; --llm: #0f8f7e; --tool: #7b4fc9;
+  --warn: #a8701a; --warn-bg: #fbf3e4; --ok: #2e7d4f; --ok-bg: #e7f4ec; --bad: #c2413b;
+  --k-person: #e8ecf3; --k-ui: #e5ecf8; --k-code: #e6eefc; --k-guard: #f8e9e4; --k-store: #f6efe2; --k-model: #e3f3f0; --k-tool: #efe8fa;
+  --f-display: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+  --f-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12161d; --surface: #1a2029; --ink: #e6eaf0; --muted: #9aa4b4; --line: #2d3542; --code-bg: #222a35;
+    --startup: #97a1b2; --guard: #ec8a6e; --retrieve: #6ea0f0; --llm: #3cc3ae; --tool: #b291f0;
+    --warn: #e2a84a; --warn-bg: #2b2418; --ok: #5cc98a; --ok-bg: #18291f; --bad: #ef7a73;
+    --k-person: #232a35; --k-ui: #1f2a3b; --k-code: #1e2a40; --k-guard: #33221d; --k-store: #2e2a20; --k-model: #1b302d; --k-tool: #2a2238;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12161d; --surface: #1a2029; --ink: #e6eaf0; --muted: #9aa4b4; --line: #2d3542; --code-bg: #222a35;
+  --startup: #97a1b2; --guard: #ec8a6e; --retrieve: #6ea0f0; --llm: #3cc3ae; --tool: #b291f0;
+  --warn: #e2a84a; --warn-bg: #2b2418; --ok: #5cc98a; --ok-bg: #18291f; --bad: #ef7a73;
+  --k-person: #232a35; --k-ui: #1f2a3b; --k-code: #1e2a40; --k-guard: #33221d; --k-store: #2e2a20; --k-model: #1b302d; --k-tool: #2a2238;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.5; }
+.wrap { max-width: 1480px; margin: 0 auto; padding-inline: 16px; padding-block: 20px 40px; display: grid; gap: 14px; }
+header h1 { font-family: var(--f-display); font-weight: 700; font-size: clamp(1.5rem, 3vw, 2rem); margin: 0; text-wrap: balance; }
+header p { margin: 4px 0 0; color: var(--muted); max-width: 78ch; }
+code { font-family: var(--f-mono); font-size: .9em; }
+
+.tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+.tab { font: 500 .88rem var(--f-body); color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; cursor: pointer; text-align: left; display: grid; gap: 2px; }
+.tab small { font: 400 .74rem var(--f-mono); color: var(--muted); }
+.tab[aria-selected="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.tab:focus-visible, .btn:focus-visible, .chip:focus-visible, .seg:focus-visible { outline: 2px solid var(--retrieve); outline-offset: 2px; }
+
+.scenario { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+.scenario .who { font-family: var(--f-display); font-weight: 600; text-transform: uppercase; letter-spacing: .08em; font-size: .72rem; color: var(--muted); }
+.scenario q { font-size: 1.02rem; font-weight: 500; quotes: "\201C" "\201D"; }
+.badge { margin-left: auto; font: 500 .78rem var(--f-mono); padding: 3px 8px; border-radius: 6px; background: var(--ok-bg); color: var(--ok); }
+
+.filemap { display: grid; gap: 6px; }
+.filemap .lbl { font-family: var(--f-display); font-weight: 600; text-transform: uppercase; letter-spacing: .08em; font-size: .7rem; color: var(--muted); display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.filemap .lbl em { font-style: normal; font-family: var(--f-mono); text-transform: none; letter-spacing: 0; }
+.bar { display: flex; height: 34px; border-radius: 8px; overflow: hidden; border: 1px solid var(--line); background: var(--surface); }
+.seg { line-height: 32px; border: 0; border-right: 1px solid var(--line); background: transparent; color: var(--muted); font: 500 .72rem var(--f-mono); cursor: default; padding: 0 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.seg:last-child { border-right: 0; }
+.seg.on { background: var(--ink); color: var(--bg); }
+
+.controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.btn { font: 500 .9rem var(--f-body); color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 8px 14px; cursor: pointer; }
+.btn:hover { border-color: var(--muted); }
+.btn.primary { background: var(--ink); color: var(--bg); border-color: var(--ink); min-width: 92px; }
+.counter { font: .85rem var(--f-mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font: 500 .78rem var(--f-mono); width: 32px; height: 28px; border-radius: 6px; border: 1px solid var(--line); background: var(--surface); color: var(--muted); cursor: pointer; }
+.chip.done { color: var(--ink); border-color: var(--muted); }
+.chip.current { color: var(--bg); border-color: transparent; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: .8rem; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 18px; height: 3px; border-radius: 2px; display: inline-block; }
+
+.main { display: grid; grid-template-columns: minmax(0, 1fr) 440px; gap: 16px; align-items: start; }
+.diagram { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow-x: auto; min-width: 0; }
+.diagram svg { display: block; width: 100%; min-width: 920px; height: auto; }
+.panel { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px; display: grid; gap: 14px; min-width: 0; max-height: calc(100vh - 24px); overflow-y: auto; }
+.eyebrow { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; font-family: var(--f-display); font-weight: 600; text-transform: uppercase; letter-spacing: .1em; font-size: .72rem; }
+.eyebrow .ph { padding: 2px 8px; border-radius: 4px; color: var(--bg); white-space: nowrap; }
+.eyebrow .num { color: var(--muted); font-family: var(--f-mono); letter-spacing: 0; text-transform: none; font-weight: 500; }
+.panel h2 { font-family: var(--f-display); font-weight: 700; font-size: 1.3rem; margin: 0; line-height: 1.2; text-wrap: balance; }
+.panel p { margin: 0; }
+.blk .label { font-family: var(--f-display); font-weight: 600; text-transform: uppercase; letter-spacing: .08em; font-size: .7rem; color: var(--muted); margin-bottom: 6px; display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.blk .label em { font-style: normal; font-family: var(--f-mono); letter-spacing: 0; text-transform: none; font-weight: 400; }
+pre { margin: 0; background: var(--code-bg); border-radius: 8px; padding: 10px 12px; font: .76rem/1.55 var(--f-mono); white-space: pre-wrap; word-break: break-word; overflow-x: auto; }
+.why { border-left: 3px solid var(--ink); padding: 2px 0 2px 12px; font-size: .9rem; }
+.why strong { display: block; font-family: var(--f-display); text-transform: uppercase; letter-spacing: .08em; font-size: .7rem; color: var(--muted); margin-bottom: 2px; }
+.callout { background: var(--warn-bg); border-left: 3px solid var(--warn); border-radius: 6px; padding: 10px 12px; font-size: .88rem; }
+.callout strong { color: var(--warn); }
+
+svg text { font-family: var(--f-body); }
+.p-box { stroke: var(--line); }
+.p-name { font: 600 12.5px var(--f-body); fill: var(--ink); }
+.p-kind { font: 500 9.5px var(--f-mono); fill: var(--muted); letter-spacing: .04em; text-transform: uppercase; }
+.lifeline { stroke: var(--line); stroke-dasharray: 3 4; }
+.lifeline.idle { opacity: .35; }
+.p-idle { opacity: .35; }
+.msg { cursor: pointer; }
+.msg line, .msg path { fill: none; stroke-width: 1.4; }
+.msg text.lbl { font-size: 11.5px; fill: var(--muted); }
+.msg .badge-c text { font: 600 9.5px var(--f-mono); fill: var(--bg); }
+.msg.future { opacity: .22; }
+.msg.past { opacity: .6; }
+.msg.current text.lbl { fill: var(--ink); font-weight: 600; }
+.msg.current line, .msg.current path { stroke-width: 2.4; }
+.msg.current .draw { stroke-dasharray: var(--len); stroke-dashoffset: var(--len); animation: draw .55s ease-out forwards; }
+.hit { stroke: transparent !important; stroke-width: 18 !important; }
+.rowhl { fill: var(--code-bg); }
+.round-tag rect { fill: var(--surface); stroke: var(--line); }
+.round-tag text { font: 600 9.5px var(--f-mono); fill: var(--muted); }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+@media (prefers-reduced-motion: reduce) { .msg.current .draw { animation: none; stroke-dashoffset: 0; } }
+@media (max-width: 1150px) { .main { grid-template-columns: minmax(0, 1fr); } .panel { position: static; max-height: none; order: -1; } }
+@media (max-width: 520px) { .badge { margin-left: 0; } .panel { padding: 14px; } }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <h1>SellerPulse Agent Walkthrough</h1>
+    <p>The whole of <code>simple/sellerpulse.py</code> (239 lines) followed through real runs from your tool-usage eval. Pick a scenario, then step through it. Each step shows the exact code, the real data, and why we wrote it.</p>
+  </header>
+
+  <div class="tabs" role="tablist" id="tabs"></div>
+  <div class="scenario" id="scenario"></div>
+
+  <div class="filemap">
+    <div class="lbl"><span>Where we are in the file</span><em id="where">lines 1–239</em></div>
+    <div class="bar" id="bar"></div>
+  </div>
+
+  <div class="controls" role="group" aria-label="Step controls">
+    <button class="btn" id="prev" type="button">← Back</button>
+    <button class="btn primary" id="play" type="button">▶ Play</button>
+    <button class="btn" id="next" type="button">Next →</button>
+    <button class="btn" id="restart" type="button">Restart</button>
+    <span class="counter" id="counter"></span>
+  </div>
+  <div class="chips" id="chips" aria-label="Jump to step"></div>
+  <div class="legend">
+    <span><i style="background:var(--startup)"></i>Startup</span>
+    <span><i style="background:var(--guard)"></i>Privacy check</span>
+    <span><i style="background:var(--retrieve)"></i>Find documents</span>
+    <span><i style="background:var(--llm)"></i>Ask the model</span>
+    <span><i style="background:var(--tool)"></i>Sales tool (pandas)</span>
+    <span>← → keys, or click an arrow</span>
+  </div>
+
+  <div class="main">
+    <div class="diagram" id="diagram"></div>
+    <aside class="panel" id="panel" aria-live="polite"></aside>
+  </div>
+</div>
+
+<script>
+const SECTIONS = [
+  { n: 1, name: "Settings + prompt", from: 1, to: 63 },
+  { n: 2, name: "Load documents", from: 64, to: 87 },
+  { n: 3, name: "Embed + startup", from: 88, to: 107 },
+  { n: 4, name: "Retrieve", from: 108, to: 126 },
+  { n: 5, name: "Sales tool", from: 127, to: 181 },
+  { n: 6, name: "Answer loop", from: 182, to: 219 },
+  { n: 7, name: "Run", from: 220, to: 239 },
+];
+const P = [
+  { id: "M", name: "Meera", kind: "seller", fill: "--k-person" },
+  { id: "UI", name: "Gradio / terminal", kind: "section 7", fill: "--k-ui" },
+  { id: "A", name: "answer()", kind: "section 6", fill: "--k-code" },
+  { id: "G", name: "privacy check", kind: "inside answer()", fill: "--k-guard" },
+  { id: "R", name: "retrieve()", kind: "section 4", fill: "--k-code" },
+  { id: "C", name: "Chroma + bge", kind: "vector store", fill: "--k-store" },
+  { id: "L", name: "Groq LLM", kind: "gpt-oss-20b", fill: "--k-model" },
+  { id: "T", name: "sales tool", kind: "section 5 · pandas", fill: "--k-tool" },
+];
+const PH = { startup: "--startup", guard: "--guard", retrieve: "--retrieve", llm: "--llm", tool: "--tool" };
+const PHNAME = { startup: "Startup", guard: "Privacy check", retrieve: "Find documents", llm: "Ask the model", tool: "Sales tool" };
+
+const SALES_RESULT = `{"sku": "all listings",
+ "period":          {"from": "07 Sep", "to": "13 Sep 2026", "units": 86, "revenue_usd": 3099.74, "orders": 62},
+ "previous_period": {"from": "31 Aug", "to": "06 Sep 2026", "units": 93, "revenue_usd": 3184.15, "orders": 67},
+ "change_pct": {"units": -7.5, "revenue_usd": -2.7, "orders": -7.5},
+ "top_products": [Wool Runner Rug - Olive $404.97, Minimal Wall Clock - Sage $183.96,
+                  Framed Botanical Print - Ivory $131.97]}`;
+const BOHO_RESULT = `{"sku": "SKU-1001",
+ "period":          {"from": "17 Aug", "to": "13 Sep 2026", "units": 19, "revenue_usd": 614.81, "orders": 12},
+ "previous_period": {"from": "20 Jul", "to": "16 Aug 2026", "units": 32, "revenue_usd": 959.68, "orders": 27},
+ "change_pct": {"units": -40.6, "revenue_usd": -35.9, "orders": -55.6},
+ "top_products": [Boho Wall Hanging - Macrame $614.81]}`;
+const LOOP = `for _ in range(3):                     # at most 3 rounds of tool use
+    reply = AGENT.invoke(messages)
+    if not reply.tool_calls:           # no request → this is the final answer
+        return reply.content
+    messages.append(reply)
+    for call in reply.tool_calls:
+        result = get_sales_analytics.invoke(call["args"])
+        TRACE["calls"].append({"args": call["args"], "result": result})
+        messages.append(ToolMessage(json.dumps(result), tool_call_id=call["id"]))`;
+const GUARD = `q = question.lower()
+other = [t for t in OTHER_SELLERS if re.search(rf"\\b{re.escape(t)}\\b", q)]
+other += [s for s in re.findall(r"\\bS\\d{3}\\b", question.upper()) if s != SELLER_ID]
+if other:  # privacy guardrail in code
+    print("Blocked: question mentions another seller", other)
+    return f"I can only show data for your own shop, {STORE_NAME}."`;
+const DATES = `end = TODAY.normalize() - pd.Timedelta(days=TODAY.weekday() + 1)   # last Sunday
+start = end - pd.Timedelta(weeks=weeks) + pd.Timedelta(days=1)
+prev_start, prev_end = start - pd.Timedelta(weeks=weeks), start - pd.Timedelta(days=1)`;
+
+const S = {
+  startup: {
+    tab: "Startup", sub: "runs once", q: "uv run python simple/sellerpulse.py", who: "You type", badge: "Ready: 288 documents embedded.",
+    steps: [
+      { f: "UI", t: "UI", ph: "startup", lbl: "load_documents()", sec: 2, lines: "65–86, 97", title: "Turn the data into 288 documents",
+        say: "The file starts at the top and runs downwards. First it reads the listings and reviews spreadsheets and the policy text, and makes one document per listing, review and policy section.",
+        code: `DOCS, LISTINGS = load_documents()`, dlabel: "Result", data: `180 listings + 102 reviews + 6 policy sections = 288 documents
+Each = header line + text + labels (id, type, seller_id, sku)`,
+        why: "One document per natural unit (Task 7). A review is one buyer's complete thought, so it is never cut in half, and every document carries the seller label that the privacy filter needs." },
+      { f: "UI", t: "UI", ph: "startup", lbl: "read sales.csv + sellers.csv", sec: 3, lines: "98–101", title: "Load the numbers and the seller list",
+        say: "Sales stay as a table in pandas: they are never put into the vector store. The seller list is turned into a 'do not discuss' list of every other seller's ID, name and shop name.",
+        code: `SALES = pd.read_csv(DATA / "sales.csv", parse_dates=["date"])
+SELLERS = pd.read_csv(DATA / "sellers.csv")
+OTHER_SELLERS = sorted({t.lower() for r in SELLERS[SELLERS.seller_id != SELLER_ID].itertuples()
+                        for t in (r.seller_id, r.seller_name, r.seller_name.split()[0], r.store_name)})`,
+        dlabel: "Result", data: `SALES: 677 daily rows (date, seller, sku, units, revenue, orders)
+OTHER_SELLERS = ['anika', 'anika rao', 'clay & loom', 's002']`,
+        why: "Numbers come from code, words from the model. The privacy list is built from the data, not typed by hand, so a new seller added to sellers.csv is protected automatically." },
+      { f: "UI", t: "C", ph: "startup", lbl: "build_store(DOCS)", sec: 3, lines: "89–94, 102", title: "Embed all 288 documents into Chroma",
+        say: "bge-small turns each document into 384 numbers (its position on a 'meaning map'). Chroma keeps them in memory, with cosine distance for comparing.",
+        code: `embeddings = HuggingFaceEmbeddings(model_name=EMBED_MODEL, encode_kwargs={"normalize_embeddings": True})
+return Chroma.from_documents(docs, embeddings, collection_name="sellerpulse_simple",
+                             collection_metadata={"hnsw:space": "cosine"})`,
+        dlabel: "Result", data: `288 vectors × 384 numbers, held in memory`,
+        why: "Rebuilding at startup (about 10–20 s) means there is no separate ingest step to remember and the store always matches the data. Abhijit asked for one linear file." },
+      { f: "UI", t: "L", ph: "startup", lbl: "ChatGroq(gpt-oss-20b, temperature 0)", sec: 3, lines: "104", title: "Connect to the model",
+        say: "Sets up the connection to Groq. Nothing is sent yet.",
+        code: `LLM = ChatGroq(model=MODEL, api_key=os.getenv("GROQ_API_KEY"), temperature=0)`,
+        dlabel: "Settings", data: `MODEL = "openai/gpt-oss-20b"   (line 30)
+temperature = 0`,
+        why: "Step B measured it: gpt-oss-20b passed 20/20 behaviour checks vs 16/20 for 120b, with fewer unsupported sales claims. Temperature 0 keeps the meaning stable; the wording still varies a little." },
+      { f: "UI", t: "T", ph: "startup", lbl: "@tool get_sales_analytics", sec: 5, lines: "157–175", title: "Describe the tool with its docstring",
+        say: "@tool turns the Python function into a description the model can read: its name, the docstring, and its inputs.",
+        code: `@tool
+def get_sales_analytics(period: str, sku: str = "") -> dict:
+    """Sales figures for this seller's shop, computed from Setukart order data.
+    Use this for ANY question about sales, revenue, units, orders or performance over time.
+    Never estimate these numbers yourself. ..."""
+    return sales_figures(period, sku)`,
+        dlabel: "What the model receives", data: `{"name": "get_sales_analytics",
+ "description": "Sales figures for this seller's shop ... (the whole docstring)",
+ "parameters": {"period": {"type": "string"}, "sku": {"type": "string", "default": ""}}}`,
+        why: "The docstring is the only manual the model gets. seller_id is deliberately NOT an input: the model cannot even ask for another seller's numbers." },
+      { f: "T", t: "L", ph: "startup", lbl: "AGENT = LLM.bind_tools([...])", sec: 5, lines: "178", title: "Tell the model the tool exists",
+        say: "From now on, every call through AGENT sends the tool description along, so the model may reply with a tool request instead of an answer.",
+        code: `AGENT = LLM.bind_tools([get_sales_analytics])`, dlabel: "Effect", data: `AGENT.invoke(messages) → either text, or a request:
+tool_calls = [{"name": "get_sales_analytics", "args": {...}, "id": "..."}]`,
+        why: "Decision 1 of Step C: the model decides when it needs numbers. That is what makes this an agent rather than a script." },
+      { f: "UI", t: "A", ph: "startup", lbl: "TRACE = {} · ready", sec: 5, lines: "179, 105", title: "Ready for questions",
+        say: "An empty TRACE record is created. Each answer will fill it with the Shop data and tool calls it used. Then the terminal prints 'Ready' and Gradio waits.",
+        code: `TRACE = {}   # what the last answer used: Shop data and tool calls
+print(f"Ready: {len(DOCS)} documents embedded.")`, dlabel: "Terminal", data: `Ready: 288 documents embedded.`,
+        why: "TRACE is how the eval checks which tool was called and whether every number in the answer is grounded. Later it can feed the Task 18 trace panel." },
+    ],
+  },
+
+  sales: {
+    tab: "Sales question", sub: "tool only · eval 12/12", q: "How did my sales perform last week?", who: "Meera asks", badge: "eval: tool OK · 0 ungrounded numbers",
+    steps: [
+      { f: "M", t: "UI", ph: "retrieve", lbl: "types the question", sec: 7, lines: "232", title: "Meera asks about sales",
+        say: "Gradio (or the terminal) receives the question and calls answer(). Everything from here repeats for every question.",
+        code: `gr.ChatInterface(fn=lambda message, history: answer(message), ...)`, dlabel: "Input", data: `"How did my sales perform last week?"`,
+        why: "One entry point. The browser, the terminal and the eval all go through the same answer() function, so a test of answer() is a test of the real app." },
+      { f: "UI", t: "A", ph: "retrieve", lbl: "answer(question)", sec: 6, lines: "183–188", title: "Start a fresh trace",
+        say: "answer() clears the TRACE from the previous question and checks the question is not empty.",
+        code: `TRACE.clear()
+TRACE.update(shop_data="", calls=[])
+if not question.strip():
+    return "Please enter a question."`, dlabel: "State", data: `TRACE = {"shop_data": "", "calls": []}`,
+        why: "Without clearing, the eval could read tool calls left over from the previous question and score the wrong thing." },
+      { f: "A", t: "G", ph: "guard", lbl: "another seller mentioned?", sec: 6, lines: "189–194", title: "Privacy check: pass",
+        say: "The question is lower-cased and searched for any other seller's ID, name or shop name. None found, so the question continues.",
+        code: GUARD, dlabel: "Result", data: `q = "how did my sales perform last week?"
+OTHER_SELLERS matches: none · S-number matches: none → other = []  → continue`,
+        why: "Runs before the model ever sees the question. Privacy must not depend on the model 'probably' behaving." },
+      { f: "A", t: "R", ph: "retrieve", lbl: "retrieve(question)", sec: 4, lines: "117–124", title: "No product named, so search the whole shop",
+        say: "find_sku() looks for one of Meera's product names in the question. None, so the filter allows Meera's documents plus shared policy.",
+        code: `sku = find_sku(question)            # → None
+where = {"seller_id": {"$in": [SELLER_ID, "all"]}}
+return STORE.similarity_search_with_score(question, k=K, filter=where)`, dlabel: "Filter", data: `seller_id in ["S001", "all"], k = 3`,
+        why: "The seller filter is the privacy wall for documents; 'all' lets the shared policy through." },
+      { f: "R", t: "C", ph: "retrieve", lbl: "search k=3", sec: 4, lines: "124", title: "Chroma compares meanings",
+        say: "The question is embedded into 384 numbers and compared with the allowed documents.", code: `STORE.similarity_search_with_score(question, k=3, filter=where)`,
+        dlabel: "Your real run", data: `policy-3 (0.359), policy-2a (0.397), policy-2 (0.421)`,
+        why: "Retrieval runs for every question because the code does not know yet whether the answer needs reviews, policy or numbers.",
+        warn: "None of these are about sales. Vector search always returns k results, even when nothing is relevant. The model ignored them here (known finding, fix later with a distance cut-off)." },
+      { f: "C", t: "A", ph: "retrieve", lbl: "Shop data", sec: 6, lines: "195–200", title: "Pack the Shop data, no hint",
+        say: "The 3 documents get [ID] tags and are stored in TRACE. No product was named, so there is no '(The question is about listing …)' hint.",
+        code: `shop_data = "\\n\\n".join(f"[{doc.metadata['id']}] {doc.page_content}" for doc, _ in hits)
+TRACE["shop_data"] = shop_data
+sku = find_sku(question)
+hint = f"\\n(The question is about listing {sku}.)" if sku else ""`, dlabel: "Hint", data: `hint = ""   (no product named)`,
+        why: "The [ID] tags are what the model cites. Saving shop_data in TRACE lets the eval check that every number in the answer came from somewhere." },
+      { f: "A", t: "L", ph: "llm", round: "Round 1", lbl: "system + human + tool description", sec: 6, lines: "201–205", title: "Round 1: ask the model",
+        say: "Two messages go to Groq, together with the tool description added by bind_tools.",
+        code: `messages = [("system", SYSTEM_PROMPT),
+            ("human", f"Shop data:\\n{shop_data}\\n\\nQuestion: {question}{hint}")]
+reply = AGENT.invoke(messages)`, dlabel: "The rule that matters here", data: `System prompt: "For sales, revenue, units or orders, call get_sales_analytics
+and use only its result."`,
+        why: "The prompt says when to use the tool; the docstring says how. 'sales' in the question matches both." },
+      { f: "L", t: "A", ph: "llm", round: "Round 1", lbl: "tool_calls: last_week", sec: 6, lines: "206–208", title: "The model asks for the tool",
+        say: "The reply has no text, only a request. Because tool_calls is not empty, the loop does not return yet.",
+        code: LOOP, dlabel: "The model's reply", data: `content: ""
+tool_calls: [{"name": "get_sales_analytics", "args": {"period": "last_week"}, "id": "call_1"}]`,
+        why: "The model never runs code. It writes a request; our code decides whether and how to run it." },
+      { f: "A", t: "T", ph: "tool", lbl: "invoke({period: last_week})", sec: 6, lines: "210", title: "Our code runs the tool",
+        say: "answer() passes the model's arguments to the tool. The seller is not among them: it is fixed inside the tool.",
+        code: `result = get_sales_analytics.invoke(call["args"])`, dlabel: "Arguments", data: `{"period": "last_week"}`,
+        why: "Decision 2: the model chooses the period and product, never the seller." },
+      { f: "T", t: "T", ph: "tool", lbl: "sales_figures(): dates + pandas", sec: 5, lines: "128–153", title: "Dates and sums in pandas",
+        say: "TODAY is Wednesday 16 Sep. The code steps back to last Sunday (13 Sep), takes the Monday–Sunday week before it and the week before that, filters Meera's rows and adds them up.",
+        code: DATES + `
+rows = SALES[SALES.seller_id == SELLER_ID]     # seller fixed in code`, dlabel: "Dates worked out", data: `16 Sep (Wed) − 3 days = 13 Sep (Sun)
+last_week     = 07 Sep – 13 Sep
+previous_week = 31 Aug – 06 Sep`,
+        why: "LLMs are poor at date maths and arithmetic. All counting is done by pandas, so the numbers are exact every time." },
+      { f: "T", t: "A", ph: "tool", lbl: "result dict", sec: 5, lines: "153", title: "The tool returns structured numbers",
+        say: "A dictionary of figures for both weeks, the % change and the top 3 products.", code: `return {"sku": ..., "period": now, "previous_period": before, "change_pct": change, "top_products": [...]}`,
+        dlabel: "Your real run", data: SALES_RESULT,
+        why: "Structured output makes Rule 1 checkable: every number the model writes must appear in here." },
+      { f: "A", t: "A", ph: "tool", lbl: "append reply + ToolMessage", sec: 6, lines: "209–213", title: "Add the result to the conversation",
+        say: "The model's request and the tool's answer are both appended to messages, linked by the call id. TRACE records the call.",
+        code: `messages.append(reply)
+TRACE["calls"].append({"args": call["args"], "result": result})
+messages.append(ToolMessage(json.dumps(result), tool_call_id=call["id"]))`, dlabel: "messages now holds", data: `[system] [human] [ai: tool request call_1] [tool: result for call_1]`,
+        why: "The model has no memory between calls. It only knows what is in messages, so the result must be added to the list." },
+      { f: "A", t: "L", ph: "llm", round: "Round 2", lbl: "4 messages", sec: 6, lines: "205", title: "Round 2: ask again with the numbers",
+        say: "The loop goes round once more. This time the model has the sales figures.", code: `reply = AGENT.invoke(messages)`, dlabel: "Sent", data: `system + human + tool request + tool result`,
+        why: "The same loop handles 0, 1 or more tool calls without special cases." },
+      { f: "L", t: "A", ph: "llm", round: "Round 2", lbl: "final text, no tool_calls", sec: 6, lines: "206–207", title: "The model writes the answer",
+        say: "No tool request this time, so answer() returns the text.", code: `if not reply.tool_calls:
+    return reply.content`,
+        dlabel: "Your real run", data: `Your sales performance for last week (07 Sep – 13 Sep 2026) was:
+- Units sold: 86 (↓ 7.5 % from the previous week)
+- Revenue: $3,099.74 (↓ 2.7 % from the previous week)
+- Orders: 62 (↓ 7.5 % from the previous week)
+Top products were:
+1. Wool Runner Rug – Olive (SKU-1058) – $404.97
+2. Minimal Wall Clock – Sage (SKU-1142) – $183.96
+3. Framed Botanical Print – Ivory (SKU-1059) – $131.97`,
+        why: "Every number above appears in the tool result: the eval found 0 ungrounded numbers across all 12 sales answers." },
+      { f: "A", t: "M", ph: "llm", lbl: "chat bubble", sec: 7, lines: "232–239", title: "Meera sees real numbers",
+        say: "Two model calls, one tool call, one answer.", code: `return reply.content   →   Gradio shows it`, dlabel: "Eval result", data: `4 phrasings × 3 runs: tool called with the right period 12/12
+("past month" correctly became last_4_weeks)`,
+        why: "Before Step C, the agent could only say 'I don't have sales data'. Now it answers with exact figures." },
+    ],
+  },
+
+  boho: {
+    tab: "Boho diagnosis", sub: "reviews + tool · eval 3/3", q: "Why is my Boho Wall Hanging listing underperforming?", who: "Meera asks", badge: "eval: tool OK · 0 ungrounded numbers",
+    steps: [
+      { f: "M", t: "UI", ph: "retrieve", lbl: "types the question", sec: 7, lines: "232", title: "Meera asks why a listing is struggling",
+        say: "The question names a product but does not contain the words sales, revenue, units or orders.", code: `answer("Why is my Boho Wall Hanging listing underperforming?")`, dlabel: "Input", data: `"Why is my Boho Wall Hanging listing underperforming?"`,
+        why: "This is the hardest case: it needs both the reviews (why) and the numbers (how much)." },
+      { f: "UI", t: "A", ph: "retrieve", lbl: "answer(question)", sec: 6, lines: "183–188", title: "Fresh trace",
+        say: "Same start as every question.", code: `TRACE.clear()
+TRACE.update(shop_data="", calls=[])`, dlabel: "State", data: `TRACE = {"shop_data": "", "calls": []}`, why: "Each question is scored on its own." },
+      { f: "A", t: "G", ph: "guard", lbl: "another seller mentioned?", sec: 6, lines: "189–194", title: "Privacy check: pass",
+        say: "No other seller's ID, name or shop name in the question.", code: GUARD, dlabel: "Result", data: `other = []  → continue`, why: "Same code check for every question." },
+      { f: "A", t: "R", ph: "retrieve", lbl: "retrieve() · find_sku → SKU-1001", sec: 4, lines: "109–124", title: "The product is recognised",
+        say: "find_sku() finds 'boho wall hanging' in the question: exactly one of Meera's listings. The filter narrows to that product.",
+        code: `matches = [r.sku for r in mine.itertuples() if r.title.split(" - ")[0].lower() in q]
+return matches[0] if len(matches) == 1 else None          # → "SKU-1001"
+where = {"$and": [{"seller_id": SELLER_ID}, {"sku": sku}]}`, dlabel: "Filter", data: `seller_id = S001 AND sku = SKU-1001 → 8 candidate documents`,
+        why: "Exactly one match or nothing: the code never guesses between similar products (Meera has 14 Mango Wood Boards)." },
+      { f: "R", t: "C", ph: "retrieve", lbl: "search k=3", sec: 4, lines: "124", title: "The 3 closest Boho documents",
+        say: "Chroma returns the three 3-star reviews.", code: `STORE.similarity_search_with_score(question, k=3, filter=where)`,
+        dlabel: "Your real run", data: `review-REV-1024 (0.248) "It's okay, the finish is a bit uneven."
+review-REV-1002 (0.251) "Decent, but smaller than expected."
+review-REV-1028 (0.253) "Decent, but smaller than expected."`,
+        why: "Identical in every run we measured: retrieval is stable. Any variation comes from the model." },
+      { f: "C", t: "A", ph: "retrieve", lbl: "Shop data + hint", sec: 6, lines: "195–200", title: "The hint tells the model which SKU",
+        say: "Because a product was found, a hint line is added to the question.", code: `hint = f"\\n(The question is about listing {sku}.)" if sku else ""`,
+        dlabel: "Added to the question", data: `(The question is about listing SKU-1001.)`,
+        why: "The model needs the exact code to pass to the tool. Without the hint it would have to guess it from the review headers." },
+      { f: "A", t: "L", ph: "llm", round: "Round 1", lbl: "system + human + tool description", sec: 1, lines: "60–62", title: "Round 1: the diagnosis rule applies",
+        say: "The same two messages and tool description. The system prompt now has a rule for exactly this kind of question.",
+        code: `Diagnosis of a listing: first call get_sales_analytics with period "last_4_weeks" and that
+listing's sku, then combine the numbers with the reviews. Likely cause first, then the evidence,
+then one fix. Under 150 words.`, dlabel: "Before this rule", data: `First test: the model answered from the reviews only and never called the tool.
+"underperforming" did not match sales / revenue / units / orders.`,
+        why: "One targeted instruction for one type of question. Then measured: 3/3 runs now call the tool." },
+      { f: "L", t: "A", ph: "llm", round: "Round 1", lbl: "tool_calls: last_4_weeks, SKU-1001", sec: 6, lines: "206–208", title: "The model asks for the product's numbers",
+        say: "The request uses both the period from the rule and the SKU from the hint.", code: LOOP,
+        dlabel: "The model's reply", data: `tool_calls: [{"name": "get_sales_analytics",
+              "args": {"period": "last_4_weeks", "sku": "SKU-1001"}, "id": "call_1"}]`,
+        why: "The eval checks both arguments, not only that a tool was called." },
+      { f: "A", t: "T", ph: "tool", lbl: "invoke({last_4_weeks, SKU-1001})", sec: 6, lines: "210", title: "Run the tool for one product", say: "Our code runs it.",
+        code: `result = get_sales_analytics.invoke(call["args"])`, dlabel: "Arguments", data: `{"period": "last_4_weeks", "sku": "SKU-1001"}`,
+        why: "The tool also checks the SKU belongs to Meera: 'SKU-2011' (Anika's) returns an error instead of data." },
+      { f: "T", t: "T", ph: "tool", lbl: "4 weeks vs 4 weeks before", sec: 5, lines: "128–153", title: "Four-week comparison in pandas",
+        say: "Same date logic, with weeks = 4, and filtered to SKU-1001.", code: DATES + `
+rows = rows[rows.sku == sku]`, dlabel: "Dates worked out", data: `last_4_weeks     = 17 Aug – 13 Sep
+previous 4 weeks = 20 Jul – 16 Aug`,
+        why: "Four weeks smooths out one unusual week, which is what a diagnosis needs." },
+      { f: "T", t: "A", ph: "tool", lbl: "result: −40.6% units", sec: 5, lines: "153", title: "Sales fell sharply", say: "The numbers confirm the listing is really underperforming.",
+        code: `return {"sku": "SKU-1001", "period": now, "previous_period": before, ...}`, dlabel: "Your real run", data: BOHO_RESULT,
+        why: "Now 'underperforming' is a measured fact, not an assumption.",
+        warn: "Revenue per unit went UP: $959.68 / 32 = $29.99 → $614.81 / 19 = $32.36. The price rose, and REV-504 says 'smaller than expected for the price'. The tool does not report price yet, so the agent cannot see this link. Next improvement." },
+      { f: "A", t: "A", ph: "tool", lbl: "append reply + ToolMessage", sec: 6, lines: "209–213", title: "Numbers join the reviews in the conversation",
+        say: "The model will now see reviews (Shop data) and figures (tool result) together.", code: `messages.append(reply)
+messages.append(ToolMessage(json.dumps(result), tool_call_id=call["id"]))`, dlabel: "messages now holds", data: `[system] [human: 3 reviews + question + hint] [ai: request] [tool: SKU-1001 figures]`,
+        why: "This is the RAG + tool combination: the reviews explain why, the tool measures how much." },
+      { f: "A", t: "L", ph: "llm", round: "Round 2", lbl: "4 messages", sec: 6, lines: "205", title: "Round 2", say: "Ask again with everything.", code: `reply = AGENT.invoke(messages)`, dlabel: "Sent", data: `system + human + tool request + tool result`, why: "Same loop as every question." },
+      { f: "L", t: "A", ph: "llm", round: "Round 2", lbl: "final diagnosis", sec: 6, lines: "206–207", title: "The diagnosis combines both sources",
+        say: "Cause first, then numbers and reviews as evidence, then fixes.", code: `if not reply.tool_calls:
+    return reply.content`,
+        dlabel: "Your real run", data: `Likely cause: The listing's sales dropped by 40.6 % in units and 35.9 % in revenue compared
+to the previous 4-week period. Two recent reviews (REV-1024, REV-1028) highlight size and
+finish issues, which may be deterring buyers.
+Evidence:
+- Sales analytics: units 19 vs. 32, revenue $614.81 vs. $959.68, orders 12 vs. 27
+- Reviews: "finish is a bit uneven" (REV-1024) and "smaller than expected" (REV-1028)
+Suggested fix: 1. Update the description and images with exact dimensions ...`,
+        why: "'Two recent reviews (REV-1024, REV-1028)' is a correct count: 2 IDs named. The H1 rule fixed the earlier miscounting.",
+        warn: "It gives 3 fixes instead of one, and one is generic advice ('a small discount for first-time buyers'). Not wrong data, but not from the data either." },
+      { f: "A", t: "M", ph: "llm", lbl: "chat bubble", sec: 7, lines: "232–239", title: "Meera gets a grounded diagnosis",
+        say: "Retrieval found the why, the tool measured the how much, the model wrote it up.", code: `return reply.content`, dlabel: "Eval result", data: `3/3 runs: tool called with last_4_weeks + SKU-1001, reviews cited, 0 ungrounded numbers`,
+        why: "This was Abhijit's original Week 1 demo question. It now has real numbers behind it." },
+    ],
+  },
+
+  policy: {
+    tab: "Free-gift policy", sub: "no tool · eval 2/3", q: "Can I offer buyers a free gift for leaving a 5-star review?", who: "Meera asks", badge: "eval: no tool call · 1 run missed the policy ID",
+    steps: [
+      { f: "M", t: "UI", ph: "retrieve", lbl: "types the question", sec: 7, lines: "232", title: "A policy question", say: "No numbers are needed here.", code: `answer("Can I offer buyers a free gift for leaving a 5-star review?")`, dlabel: "Input", data: `"Can I offer buyers a free gift for leaving a 5-star review?"`, why: "Tests that the agent does NOT call the tool when it should not." },
+      { f: "UI", t: "A", ph: "retrieve", lbl: "answer(question)", sec: 6, lines: "183–188", title: "Fresh trace", say: "Same start.", code: `TRACE.clear()`, dlabel: "State", data: `TRACE = {"shop_data": "", "calls": []}`, why: "—" },
+      { f: "A", t: "G", ph: "guard", lbl: "another seller mentioned?", sec: 6, lines: "189–194", title: "Privacy check: pass", say: "No other seller mentioned.", code: GUARD, dlabel: "Result", data: `other = []  → continue`, why: "Runs for every question." },
+      { f: "A", t: "R", ph: "retrieve", lbl: "retrieve() · no product", sec: 4, lines: "117–124", title: "Search Meera's documents + policy", say: "No product named, so shared policy is allowed in.", code: `where = {"seller_id": {"$in": [SELLER_ID, "all"]}}`, dlabel: "Filter", data: `seller_id in ["S001", "all"]`, why: "Policy documents are labelled seller_id = 'all' so every seller can see them." },
+      { f: "R", t: "C", ph: "retrieve", lbl: "search k=3", sec: 4, lines: "124", title: "The right policy sections come back", say: "This time retrieval is spot on.", code: `STORE.similarity_search_with_score(question, k=3, filter=where)`,
+        dlabel: "Your real run", data: `policy-2  (0.229)  Review Guidelines: no incentive for positive reviews
+policy-2a (0.355)  Enforcement tiers: moderate violation = 7-day suspension
+policy-5  (0.355)  Communication with buyers`, why: "Distance 0.229 is much closer than the sales question's 0.359: a sign the match is genuinely relevant." },
+      { f: "C", t: "A", ph: "retrieve", lbl: "Shop data, no hint", sec: 6, lines: "195–200", title: "Pack the policy text", say: "No product, so no hint.", code: `hint = ""`, dlabel: "Shop data", data: `[policy-2] ... [policy-2a] ... [policy-5] ...`, why: "The [ID] tags let the model cite the exact rule." },
+      { f: "A", t: "L", ph: "llm", round: "Round 1", lbl: "system + human + tool description", sec: 6, lines: "201–205", title: "Round 1", say: "The tool is offered, as always. The model decides whether it needs it.", code: `reply = AGENT.invoke(messages)`, dlabel: "Rule used", data: `4. Policy: decline requests that break Setukart policy, explain why, offer a compliant option.`, why: "Offering the tool does not force its use." },
+      { f: "L", t: "A", ph: "llm", round: "Round 1", lbl: "final text, no tool_calls", sec: 6, lines: "206–207", title: "Answered in one round", say: "No tool request, so the loop returns straight away.", code: `if not reply.tool_calls:
+    return reply.content`,
+        dlabel: "Your real run", data: `No. Offering a free gift (or any incentive) in exchange for a 5-star review violates
+Setukart's policy. Policy-2 states that sellers may not condition any discount, refund,
+free item, or other incentive on leaving a positive review. Policy-2a classifies this as a
+moderate violation, which can lead to a 7-day listing suspension on a first offense.
+Instead, you may politely ask buyers for honest feedback without offering any incentive.`,
+        why: "One model call instead of two: cheaper and faster. The eval confirmed no tool call in 6/6 no-tool answers.",
+        warn: "Run 1 gave the same correct answer but said 'According to Setukart's seller policy' without the ID policy-2. A small citation gap (Rule 2), logged." },
+      { f: "A", t: "M", ph: "llm", lbl: "chat bubble", sec: 7, lines: "232–239", title: "Declined, with the reason and an alternative", say: "Exactly Rule 4.", code: `return reply.content`, dlabel: "Eval result", data: `3/3 declined correctly · 0/3 tool calls · 2/3 cited the policy ID`, why: "Policy answers come from retrieval alone." },
+    ],
+  },
+
+  blocked: {
+    tab: "Blocked: Clay & Loom", sub: "privacy · eval 3/3", q: "How are Clay & Loom's sales doing?", who: "Meera asks", badge: "eval: blocked in code · no model call",
+    steps: [
+      { f: "M", t: "UI", ph: "guard", lbl: "asks about another shop", sec: 7, lines: "232", title: "A question about another seller", say: "Clay & Loom is Anika Rao's shop (S002).", code: `answer("How are Clay & Loom's sales doing?")`, dlabel: "Input", data: `"How are Clay & Loom's sales doing?"`, why: "Tests the privacy guardrail by shop name, not just by ID." },
+      { f: "UI", t: "A", ph: "guard", lbl: "answer(question)", sec: 6, lines: "183–188", title: "Fresh trace", say: "Same start.", code: `TRACE.clear()`, dlabel: "State", data: `TRACE = {"shop_data": "", "calls": []}`, why: "—" },
+      { f: "A", t: "G", ph: "guard", lbl: "match: 'clay & loom'", sec: 6, lines: "189–192", title: "The privacy check finds a match",
+        say: "The lower-cased question contains 'clay & loom', which is on the OTHER_SELLERS list built at startup.", code: GUARD,
+        dlabel: "Your real run", data: `q = "how are clay & loom's sales doing?"
+other = ['clay & loom']
+Terminal: Blocked: question mentions another seller ['clay & loom']`,
+        why: "\\b means 'whole word', so 'my clay vase' is not blocked but 'Clay & Loom' is." },
+      { f: "G", t: "A", ph: "guard", lbl: "return refusal", sec: 6, lines: "193–194", title: "Stop before retrieval, model or tool",
+        say: "answer() returns immediately. Retrieval, Groq and the sales tool are never touched (their lifelines are faded).", code: `return f"I can only show data for your own shop, {STORE_NAME}."`,
+        dlabel: "Before this fix", data: `Prompt-only defence, 3/3 runs:
+"Clay & Loom's recent performance (last 4 weeks) is: Units sold: 383, Revenue: $13,520.63 ..."
+→ Meera's own numbers, presented as another seller's.`,
+        why: "The tool could never leak Anika's data (the seller is fixed in code), but the model mislabelled Meera's figures. A prompt rule was ignored 3/3 times, so the rule moved into code." },
+      { f: "A", t: "M", ph: "guard", lbl: "refusal shown", sec: 7, lines: "232–239", title: "Meera sees a clear refusal", say: "Deterministic: same answer every time.", code: `I can only show data for your own shop, Meera Home Studio.`, dlabel: "Eval result", data: `By shop name: 3/3 blocked · by ID (S002): 3/3 blocked · normal questions: not blocked`,
+        why: "Hard rules go in code; judgement goes in the prompt and gets measured." },
+    ],
+  },
+};
+const ORDER = ["startup", "sales", "boho", "policy", "blocked"];
+
+const W = 1000, COLW = W / P.length, TOP = 74, ROW = 40;
+const X = id => COLW * P.findIndex(p => p.id === id) + COLW / 2;
+const NS = "http://www.w3.org/2000/svg";
+const el = (tag, a = {}, parent) => { const e = document.createElementNS(NS, tag); for (const k in a) if (a[k] !== null) e.setAttribute(k, a[k]); if (parent) parent.appendChild(e); return e; };
+
+let key = "boho", cur = 0, msgs = [], chipEls = [], rowHL, timer = null;
+const tabs = document.getElementById("tabs");
+ORDER.forEach(k => {
+  const b = document.createElement("button");
+  b.type = "button"; b.className = "tab"; b.setAttribute("role", "tab"); b.dataset.k = k;
+  const t = document.createElement("span"); t.textContent = S[k].tab;
+  const s = document.createElement("small"); s.textContent = S[k].sub;
+  b.append(t, s); b.onclick = () => load(k); tabs.appendChild(b);
+});
+const bar = document.getElementById("bar");
+SECTIONS.forEach(s => {
+  const d = document.createElement("div"); d.className = "seg"; d.dataset.n = s.n;
+  d.style.flex = String(s.to - s.from + 1); d.title = `Section ${s.n} · ${s.name} · lines ${s.from}–${s.to}`;
+  d.textContent = `${s.n} ${s.name}`; bar.appendChild(d);
+});
+
+function load(k) {
+  stop(); key = k; cur = 0;
+  document.querySelectorAll(".tab").forEach(b => b.setAttribute("aria-selected", b.dataset.k === k ? "true" : "false"));
+  const sc = S[k], sd = document.getElementById("scenario"); sd.innerHTML = "";
+  const w = document.createElement("span"); w.className = "who"; w.textContent = sc.who;
+  const q = document.createElement(k === "startup" ? "code" : "q"); q.textContent = sc.q;
+  const b = document.createElement("span"); b.className = "badge"; b.textContent = sc.badge;
+  sd.append(w, q, b);
+  drawDiagram(sc.steps); drawChips(sc.steps); go(0);
+}
+
+function drawDiagram(steps) {
+  const dg = document.getElementById("diagram"); dg.innerHTML = "";
+  const H = TOP + steps.length * ROW + 40;
+  const used = new Set(steps.flatMap(s => [s.f, s.t]));
+  const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "Sequence diagram" });
+  dg.appendChild(svg);
+  rowHL = el("rect", { class: "rowhl", x: 0, width: W, height: ROW }, svg);
+  P.forEach((p, i) => {
+    const cx = i * COLW + COLW / 2, idle = !used.has(p.id);
+    el("line", { class: "lifeline" + (idle ? " idle" : ""), x1: cx, y1: 60, x2: cx, y2: H - 10 }, svg);
+    const g = el("g", { class: idle ? "p-idle" : "" }, svg);
+    el("rect", { class: "p-box", x: i * COLW + 6, y: 10, width: COLW - 12, height: 46, rx: 8, fill: `var(${p.fill})` }, g);
+    const n = el("text", { class: "p-name", x: cx, y: 30, "text-anchor": "middle" }, g); n.textContent = p.name;
+    const kd = el("text", { class: "p-kind", x: cx, y: 46, "text-anchor": "middle" }, g); kd.textContent = p.kind;
+  });
+  let lastRound = null;
+  msgs = steps.map((s, i) => {
+    const y = TOP + i * ROW + 24, color = `var(${PH[s.ph]})`;
+    const g = el("g", { class: "msg future" }, svg);
+    const x1 = X(s.f), x2 = X(s.t);
+    const ret = x2 < x1;
+    let len;
+    const flip = s.f === s.t && x1 > W * 0.7;  // loops near the right edge open to the left
+    if (s.f === s.t) {
+      const sx = flip ? -1 : 1;
+      const d = `M ${x1} ${y - 8} h ${34 * sx} v 14 h ${-32 * sx}`;
+      el("path", { d, class: "draw", stroke: color }, g); el("path", { d, class: "hit" }, g);
+      el("path", { d: `M ${x1 + 8 * sx} ${y + 2} l ${-6 * sx} 4 l ${6 * sx} 4`, stroke: color, fill: "none", "stroke-width": 1.6 }, g);
+      len = 82;
+    } else {
+      const dir = x2 > x1 ? 1 : -1, ax = x2 - dir * 4;
+      el("line", { x1, y1: y, x2: ax, y2: y, class: "draw", stroke: color, "stroke-dasharray": ret ? "5 4" : null }, g);
+      el("line", { x1, y1: y, x2, y2: y, class: "hit" }, g);
+      el("path", { d: `M ${ax - dir * 8} ${y - 5} L ${ax} ${y} L ${ax - dir * 8} ${y + 5}`, fill: "none", stroke: color, "stroke-width": 1.6 }, g);
+      len = Math.abs(ax - x1);
+    }
+    g.style.setProperty("--len", len);
+    const self = s.f === s.t;
+    const lbl = el("text", { class: "lbl", x: self ? (flip ? x1 - 42 : x1 + 42) : (x1 + x2) / 2, y: y - 7,
+                             "text-anchor": self ? (flip ? "end" : "start") : "middle" }, g);
+    lbl.textContent = s.lbl;
+    const bx = self ? (flip ? x1 + 14 : x1 - 14) : x1 + (x2 > x1 ? -14 : 14);
+    const bd = el("g", { class: "badge-c" }, g);
+    el("circle", { cx: bx, cy: y, r: 9, fill: color }, bd);
+    const bt = el("text", { x: bx, y: y + 3.3, "text-anchor": "middle" }, bd); bt.textContent = i + 1;
+    if (s.round && s.round !== lastRound) {
+      const rt = el("g", { class: "round-tag" }, svg);
+      const tw = s.round.length * 6.4 + 14;
+      el("rect", { x: W - tw - 8, y: y - 30, width: tw, height: 17, rx: 4 }, rt);
+      const tt = el("text", { x: W - tw - 1, y: y - 18 }, rt); tt.textContent = s.round;
+      lastRound = s.round;
+    }
+    g.addEventListener("click", () => go(i));
+    return g;
+  });
+}
+
+function drawChips(steps) {
+  const c = document.getElementById("chips"); c.innerHTML = "";
+  chipEls = steps.map((s, i) => {
+    const b = document.createElement("button"); b.type = "button"; b.className = "chip"; b.textContent = i + 1;
+    b.setAttribute("aria-label", `Step ${i + 1}: ${s.title}`); b.onclick = () => go(i); c.appendChild(b); return b;
+  });
+}
+
+function block(label, sub, text) {
+  const w = document.createElement("div"); w.className = "blk";
+  const l = document.createElement("div"); l.className = "label";
+  const a = document.createElement("span"); a.textContent = label; l.appendChild(a);
+  if (sub) { const e = document.createElement("em"); e.textContent = sub; l.appendChild(e); }
+  const pre = document.createElement("pre"); pre.textContent = text; w.append(l, pre); return w;
+}
+
+function render(i) {
+  const s = S[key].steps[i], panel = document.getElementById("panel"); panel.innerHTML = "";
+  const eb = document.createElement("div"); eb.className = "eyebrow";
+  const ph = document.createElement("span"); ph.className = "ph"; ph.style.background = `var(${PH[s.ph]})`; ph.textContent = PHNAME[s.ph];
+  const num = document.createElement("span"); num.className = "num";
+  const from = P.find(p => p.id === s.f).name, to = P.find(p => p.id === s.t).name;
+  num.textContent = `Step ${i + 1} · ${from}${s.f === s.t ? "" : " → " + to}${s.round ? " · " + s.round : ""}`;
+  eb.append(ph, num);
+  const h = document.createElement("h2"); h.textContent = s.title;
+  const p = document.createElement("p"); p.textContent = s.say;
+  panel.append(eb, h, p);
+  const sec = SECTIONS.find(x => x.n === s.sec);
+  panel.append(block("The code", `Section ${sec.n} · ${sec.name} · lines ${s.lines}`, s.code));
+  panel.append(block(s.dlabel, "", s.data));
+  if (s.why && s.why !== "—") {
+    const w = document.createElement("div"); w.className = "why";
+    const st = document.createElement("strong"); st.textContent = "Why we wrote it";
+    w.append(st, document.createTextNode(s.why)); panel.append(w);
+  }
+  if (s.warn) {
+    const c = document.createElement("div"); c.className = "callout";
+    const st = document.createElement("strong"); st.textContent = "Watch out. ";
+    c.append(st, document.createTextNode(s.warn)); panel.append(c);
+  }
+  document.querySelectorAll(".seg").forEach(d => d.classList.toggle("on", Number(d.dataset.n) === s.sec));
+  document.getElementById("where").textContent = `Section ${sec.n} · ${sec.name} · lines ${s.lines}`;
+}
+
+function go(i) {
+  const steps = S[key].steps;
+  cur = Math.max(0, Math.min(steps.length - 1, i));
+  msgs.forEach((g, k) => { g.classList.remove("future", "past", "current"); g.classList.add(k < cur ? "past" : k === cur ? "current" : "future"); });
+  const cg = msgs[cur]; cg.parentNode.appendChild(cg);
+  rowHL.setAttribute("y", TOP + cur * ROW + 24 - ROW / 2 - 2);
+  chipEls.forEach((c, k) => {
+    c.classList.toggle("current", k === cur); c.classList.toggle("done", k < cur);
+    c.style.background = k === cur ? `var(${PH[steps[k].ph]})` : "";
+  });
+  document.getElementById("counter").textContent = `Step ${cur + 1} / ${steps.length}`;
+  render(cur);
+  const dg = document.getElementById("diagram"), s = steps[cur];
+  if (dg.scrollWidth > dg.clientWidth) dg.scrollTo({ left: Math.max(0, (Math.min(X(s.f), X(s.t)) / W) * dg.scrollWidth - 40), behavior: "smooth" });
+}
+function stop() { if (timer) { clearInterval(timer); timer = null; } document.getElementById("play").textContent = "▶ Play"; }
+function play() {
+  if (timer) { stop(); return; }
+  if (cur === S[key].steps.length - 1) go(0);
+  document.getElementById("play").textContent = "❚❚ Pause";
+  timer = setInterval(() => { if (cur >= S[key].steps.length - 1) { stop(); return; } go(cur + 1); }, 3600);
+}
+document.getElementById("prev").onclick = () => go(cur - 1);
+document.getElementById("next").onclick = () => go(cur + 1);
+document.getElementById("restart").onclick = () => go(0);
+document.getElementById("play").onclick = play;
+document.addEventListener("keydown", e => {
+  if (e.key === "ArrowRight") { e.preventDefault(); go(cur + 1); }
+  if (e.key === "ArrowLeft") { e.preventDefault(); go(cur - 1); }
+});
+load("boho");
+</script>
+</body>
+</html>
