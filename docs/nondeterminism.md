@@ -47,3 +47,17 @@ Raw output: [nondeterminism-h1.md](nondeterminism-h1.md)
 Conclusion: H1 confirmed. The model writes counts because they sound like evidence, not because it counted. A prompt rule cuts the error from 5/5 to 1/5 but cannot guarantee 0 → needs a code check after the LLM (Week 3 guardrail). Runs 3 and 5 were word-for-word identical: temperature 0 gives mostly, not fully, repeatable output.
 
 Next: H2 (duplicate reviews, K = 2) and H4 (gpt-oss-20b) only if needed; next problem to target is the unsupported "sales/conversion" claims.
+
+## Experiment: 5 variants × 5 runs (simple/experiment.py)
+
+Raw output: [nondeterminism-experiments.md](nondeterminism-experiments.md). Scorer's count column was checked by hand: flagged counts in V2/V4 were true ("all three reviews are 3-star", "two reviews (REV-1002 and REV-1028)"), so real wrong counts = 0/25.
+
+| Variant | Wrong counts | Invented numbers | Sales/conversion claims | Distinct answers | Verdict |
+|---|---|---|---|---|---|
+| V0 baseline (120b) | 0 | 0 | 4/5 | 5 | accurate, drifts |
+| V1 remove duplicates | 0 | 0 | 5/5 | 5 | rejected: no gain, loses signal |
+| V2 seed 42 | 0 | 1 (X × Y placeholder) | 4/5 | 5 | rejected: seed has no effect on Groq |
+| V3 gpt-oss-20b | 0 | 0 | 0/5 | 1 | best: fully repeatable |
+| V4 reasoning low | 0 | 1 ("45 cm × 30 cm" made up) | 4/5 | 4 | rejected: invents measurements |
+
+Conclusions: H1 rule fixed wrong counts (0/25). gpt-oss-20b was fully repeatable on this question. Seed, de-duplication and low reasoning effort do not help. Lesson: automatic checks need checking too. Next: confirm 20b on more questions before switching.
