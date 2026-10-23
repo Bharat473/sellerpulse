@@ -96,6 +96,9 @@ def build_store(docs):
 print("Loading data and building the vector store...")
 DOCS, LISTINGS = load_documents()
 SALES = pd.read_csv(DATA / "sales.csv", parse_dates=["date"])
+SELLERS = pd.read_csv(DATA / "sellers.csv")
+OTHER_SELLERS = sorted({t.lower() for r in SELLERS[SELLERS.seller_id != SELLER_ID].itertuples()
+                        for t in (r.seller_id, r.seller_name, r.seller_name.split()[0], r.store_name)})
 STORE = build_store(DOCS)
 load_dotenv(ROOT / ".env")
 LLM = ChatGroq(model=MODEL, api_key=os.getenv("GROQ_API_KEY"), temperature=0)
@@ -173,20 +176,26 @@ def get_sales_analytics(period: str, sku: str = "") -> dict:
 
 
 AGENT = LLM.bind_tools([get_sales_analytics])  # the model now knows the tool exists
+TRACE = {}  # what the last answer used: Shop data and tool calls (read by the eval and, later, the UI)
 
 
 # ---------------------------------------------------------------- 6. Answer (the agent loop)
 def answer(question):
     """Retrieve -> ask Groq -> if it asks for the tool, run it and ask again -> return the text."""
+    TRACE.clear()
+    TRACE.update(shop_data="", calls=[])
     if not question.strip():
         return "Please enter a question."
-    other = [s for s in re.findall(r"\bS\d{3}\b", question.upper()) if s != SELLER_ID]
-    if other:  # privacy guardrail in code: never discuss another seller
+    q = question.lower()
+    other = [t for t in OTHER_SELLERS if re.search(rf"\b{re.escape(t)}\b", q)]
+    other += [s for s in re.findall(r"\bS\d{3}\b", question.upper()) if s != SELLER_ID]
+    if other:  # privacy guardrail in code: never discuss another seller (ID, name or shop name)
         print("Blocked: question mentions another seller", other)
         return f"I can only show data for your own shop, {STORE_NAME}."
     hits = retrieve(question)
     shop_data = "\n\n".join(f"[{doc.metadata['id']}] {doc.page_content}" for doc, _ in hits)
     print("Retrieved:", ", ".join(f"{doc.metadata['id']} ({dist:.3f})" for doc, dist in hits))
+    TRACE["shop_data"] = shop_data
     sku = find_sku(question)
     hint = f"\n(The question is about listing {sku}.)" if sku else ""
     messages = [("system", SYSTEM_PROMPT),
@@ -200,6 +209,7 @@ def answer(question):
             for call in reply.tool_calls:
                 result = get_sales_analytics.invoke(call["args"])
                 print("Tool:", call["name"], call["args"], "->", json.dumps(result))
+                TRACE["calls"].append({"args": call["args"], "result": result})
                 messages.append(ToolMessage(json.dumps(result), tool_call_id=call["id"]))
         return "Sorry, I couldn't finish that answer. Please try rephrasing."
     except Exception as err:  # e.g. Groq rate limit or a call to a tool that doesn't exist
