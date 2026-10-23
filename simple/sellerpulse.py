@@ -179,10 +179,13 @@ def get_sales_analytics(period: str, sku: str = "") -> dict:
 
 
 # ---------------------------------------------------------------- 5b. Memory (preferences that survive a restart)
+# Hard rule in code: a preference may never remove the DRAFT label / her approval (rule 3).
+BREAKS_RULES = re.compile(r"\b(never|no|don['’]?t|do not|stop|skip|remove|drop|omit|without)\b.*\b(draft|approv)\w*", re.I)
+
 def load_preferences():
     """This seller's saved preferences from memory.json (an empty list if none yet)."""
     memory = json.loads(MEMORY_FILE.read_text()) if MEMORY_FILE.exists() else {}
-    return memory.get(SELLER_ID, [])
+    return [p for p in memory.get(SELLER_ID, []) if not BREAKS_RULES.search(p)]  # skip bad ones already saved
 
 
 @tool
@@ -199,6 +202,9 @@ def save_preference(preference: str) -> dict:
     Returns:
         {"saved": "<the sentence>", "all_preferences": [...]}
     """
+    if BREAKS_RULES.search(preference):
+        return {"error": "Not saved: every reply a buyer sees must start with 'DRAFT – awaiting your approval' "
+                         "so she approves it first (rule 3). Tell her why and offer a preference that keeps the label."}
     memory = json.loads(MEMORY_FILE.read_text()) if MEMORY_FILE.exists() else {}
     prefs = memory.setdefault(SELLER_ID, [])  # seller fixed in code, like the sales tool
     if preference not in prefs:
