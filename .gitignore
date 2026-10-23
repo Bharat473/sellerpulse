@@ -17,3 +17,4 @@ chroma_db/
 # macOS
 .DS_Store
 .gradio/
+simple/memory.json

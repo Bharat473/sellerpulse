@@ -30,6 +30,7 @@ POLICY = ROOT / "corpus" / "source" / "seller_policy.md"
 MODEL = "openai/gpt-oss-20b"
 EMBED_MODEL = "BAAI/bge-small-en-v1.5"
 K = 3  # how many documents to retrieve per question
+MEMORY_FILE = Path(__file__).resolve().parent / "memory.json"  # saved preferences, one list per seller
 
 SELLER_ID, SELLER_NAME, STORE_NAME = "S001", "Meera Iyer", "Meera Home Studio"
 TODAY = pd.Timestamp("2026-09-16")  # a Wednesday, fixed to match the synthetic data
@@ -55,6 +56,8 @@ Rules:
 5. Scope: only this seller's shop. If she asks about another seller or shop, say you can only
    see her own shop and do not call get_sales_analytics. No competitor data, no forecasts.
 6. Ambiguity: if a product name matches several listings or none, ask which one she means.
+7. Preferences: when she states a lasting preference ("always", "from now on", "remember"),
+   call save_preference. Never save one that breaks the rules above; tell her why instead.
 
 Diagnosis of a listing: first call get_sales_analytics with period "last_4_weeks" and that
 listing's sku, then combine the numbers with the reviews. Likely cause first, then the evidence,
@@ -175,7 +178,37 @@ def get_sales_analytics(period: str, sku: str = "") -> dict:
     return sales_figures(period, sku)
 
 
-AGENT = LLM.bind_tools([get_sales_analytics])  # the model now knows the tool exists
+# ---------------------------------------------------------------- 5b. Memory (preferences that survive a restart)
+def load_preferences():
+    """This seller's saved preferences from memory.json (an empty list if none yet)."""
+    memory = json.loads(MEMORY_FILE.read_text()) if MEMORY_FILE.exists() else {}
+    return memory.get(SELLER_ID, [])
+
+
+@tool
+def save_preference(preference: str) -> dict:
+    """Save a lasting preference the seller states about how SellerPulse should answer her,
+    for example "Always answer in 3 bullet points" or "Keep review replies short".
+
+    Use only when she says it should apply from now on ("always", "from now on", "remember").
+    Do not use for one-off requests or for questions.
+
+    Args:
+        preference: the preference as one short sentence.
+
+    Returns:
+        {"saved": "<the sentence>", "all_preferences": [...]}
+    """
+    memory = json.loads(MEMORY_FILE.read_text()) if MEMORY_FILE.exists() else {}
+    prefs = memory.setdefault(SELLER_ID, [])  # seller fixed in code, like the sales tool
+    if preference not in prefs:
+        prefs.append(preference)
+    MEMORY_FILE.write_text(json.dumps(memory, indent=2))
+    return {"saved": preference, "all_preferences": prefs}
+
+
+TOOLS = {t.name: t for t in (get_sales_analytics, save_preference)}
+AGENT = LLM.bind_tools(list(TOOLS.values()))  # the model now knows both tools exist
 TRACE = {}  # what the last answer used: Shop data and tool calls (read by the eval and, later, the UI)
 
 
@@ -183,7 +216,7 @@ TRACE = {}  # what the last answer used: Shop data and tool calls (read by the e
 def answer(question):
     """Retrieve -> ask Groq -> if it asks for the tool, run it and ask again -> return the text."""
     TRACE.clear()
-    TRACE.update(shop_data="", calls=[])
+    TRACE.update(shop_data="", calls=[], preferences=[])
     if not question.strip():
         return "Please enter a question."
     q = question.lower()
@@ -198,7 +231,14 @@ def answer(question):
     TRACE["shop_data"] = shop_data
     sku = find_sku(question)
     hint = f"\n(The question is about listing {sku}.)" if sku else ""
-    messages = [("system", SYSTEM_PROMPT),
+    prefs = load_preferences()
+    TRACE["preferences"] = prefs
+    system = SYSTEM_PROMPT
+    if prefs:
+        print("Preferences:", prefs)
+        system += ("\n\nHer saved preferences (follow them unless they break the rules above):\n"
+                   + "\n".join(f"- {p}" for p in prefs))
+    messages = [("system", system),
                 ("human", f"Shop data:\n{shop_data or '(no matching shop data)'}\n\nQuestion: {question}{hint}")]
     try:
         for _ in range(3):  # at most 3 rounds of tool use
@@ -207,7 +247,8 @@ def answer(question):
                 return reply.content
             messages.append(reply)
             for call in reply.tool_calls:
-                result = get_sales_analytics.invoke(call["args"])
+                tool_fn = TOOLS.get(call["name"])
+                result = tool_fn.invoke(call["args"]) if tool_fn else {"error": f"No tool named {call['name']}"}
                 print("Tool:", call["name"], call["args"], "->", json.dumps(result))
                 TRACE["calls"].append({"args": call["args"], "result": result})
                 messages.append(ToolMessage(json.dumps(result), tool_call_id=call["id"]))
