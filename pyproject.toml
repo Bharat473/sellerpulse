@@ -1,7 +1,7 @@
 [project]
 name = "sellerpulse"
 version = "0.1.0"
-requires-python = ">=3.14"
+requires-python = ">=3.13,<3.14"
 dependencies = [
     "gradio>=6.29.1",
     "langchain>=1.4.3",
