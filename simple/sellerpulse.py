@@ -20,6 +20,8 @@ load_dotenv(Path(__file__).resolve().parent.parent / ".env")  # before importing
 import opik
 from opik import opik_context, track
 from opik.integrations.langchain import OpikTracer
+from nemoguardrails import LLMRails, RailsConfig
+from nemoguardrails.rails.llm.options import RailType
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
 from langchain_core.messages import ToolMessage
@@ -109,6 +111,9 @@ OTHER_SELLERS = sorted({t.lower() for r in SELLERS[SELLERS.seller_id != SELLER_I
 STORE = build_store(DOCS)
 LLM = ChatGroq(model=MODEL, api_key=os.getenv("GROQ_API_KEY"), temperature=0)
 TRACER = OpikTracer(tags=["sellerpulse"])  # sends model + tool calls to Opik, inside the current trace
+GUARD_CONFIG = RailsConfig.from_path(str(ROOT / "guardrails"))         # NeMo: config.yml + prompts.yml
+GUARD_CONFIG.models[0].parameters["api_key"] = os.getenv("GROQ_API_KEY")  # key from .env, never in the yml
+RAILS = LLMRails(GUARD_CONFIG)
 print(f"Ready: {len(DOCS)} documents embedded.")
 
 
@@ -224,12 +229,51 @@ AGENT = LLM.bind_tools(list(TOOLS.values()))  # the model now knows both tools e
 TRACE = {}  # what the last answer used: Shop data and tool calls (read by the eval and, later, the UI)
 
 
+# ---------------------------------------------------------------- 5c. NeMo Guardrails (checks around the agent)
+INPUT_BLOCKED = "I can't help with that. I can help with your sales, listings, reviews and Setukart policy."
+OUTPUT_BLOCKED = "I held back that answer because it broke a safety rule. Please rephrase your question."
+CHECK_FAILED = "The safety check is unavailable right now. Please try again in a moment."
+
+
+def tag_blocked():
+    """Tag the Opik trace as blocked by NeMo (never let tracing break an answer)."""
+    try:
+        opik_context.update_current_trace(tags=["nemo_blocked"])
+    except Exception:
+        pass
+
+
+@track(name="nemo_check")
+def nemo_check(question, reply=None):
+    """NeMo check of the question alone (input) or of question + answer (output). True = allowed."""
+    messages = [{"role": "user", "content": question}]
+    if reply is not None:
+        messages.append({"role": "assistant", "content": reply})
+    kind = RailType.INPUT if reply is None else RailType.OUTPUT
+    return RAILS.check(messages, rail_types=[kind]).status.value != "blocked"
+
+
+def checked(question, text):
+    """The answer if NeMo's output check allows it, otherwise a refusal (also when the check fails)."""
+    try:
+        allowed = nemo_check(question, text)
+    except Exception as err:  # e.g. rate limit: safer to say no than to show an unchecked answer
+        print("NeMo check failed:", err)
+        return CHECK_FAILED
+    if not allowed:
+        print("NeMo blocked the answer:", text[:80].replace("\n", " "))
+        TRACE["nemo"] = "output blocked"
+        tag_blocked()
+        return OUTPUT_BLOCKED
+    return text
+
+
 # ---------------------------------------------------------------- 6. Answer (the agent loop)
 @track(name="answer")  # one Opik trace per question
 def answer(question):
     """Retrieve -> ask Groq -> if it asks for the tool, run it and ask again -> return the text."""
     TRACE.clear()
-    TRACE.update(shop_data="", calls=[], preferences=[])
+    TRACE.update(shop_data="", calls=[], preferences=[], nemo="not checked")
     if not question.strip():
         return "Please enter a question."
     q = question.lower()
@@ -239,6 +283,16 @@ def answer(question):
         print("Blocked: question mentions another seller", other)
         opik_context.update_current_trace(tags=["blocked"], metadata={"seller_id": SELLER_ID, "blocked_terms": other})
         return f"I can only show data for your own shop, {STORE_NAME}."
+    try:  # NeMo input check: after the free code check, before any retrieval or model call
+        if not nemo_check(question):
+            print("NeMo blocked the question")
+            TRACE["nemo"] = "input blocked"
+            tag_blocked()
+            return INPUT_BLOCKED
+    except Exception as err:
+        print("NeMo check failed:", err)
+        return CHECK_FAILED
+    TRACE["nemo"] = "passed"
     hits = retrieve(question)
     shop_data = "\n\n".join(f"[{doc.metadata['id']}] {doc.page_content}" for doc, _ in hits)
     print("Retrieved:", ", ".join(f"{doc.metadata['id']} ({dist:.3f})" for doc, dist in hits))
@@ -259,7 +313,7 @@ def answer(question):
         for _ in range(3):  # at most 3 rounds of tool use
             reply = AGENT.invoke(messages, config={"callbacks": [TRACER]})
             if not reply.tool_calls:
-                return reply.content
+                return checked(question, reply.content)  # NeMo output check before Meera sees it
             messages.append(reply)
             for call in reply.tool_calls:
                 tool_fn = TOOLS.get(call["name"])
