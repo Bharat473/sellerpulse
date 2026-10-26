@@ -16,6 +16,10 @@ from pathlib import Path
 import gradio as gr
 import pandas as pd
 from dotenv import load_dotenv
+load_dotenv(Path(__file__).resolve().parent.parent / ".env")  # before importing opik: it reads its settings here
+import opik
+from opik import opik_context, track
+from opik.integrations.langchain import OpikTracer
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
 from langchain_core.messages import ToolMessage
@@ -103,8 +107,8 @@ SELLERS = pd.read_csv(DATA / "sellers.csv")
 OTHER_SELLERS = sorted({t.lower() for r in SELLERS[SELLERS.seller_id != SELLER_ID].itertuples()
                         for t in (r.seller_id, r.seller_name, r.seller_name.split()[0], r.store_name)})
 STORE = build_store(DOCS)
-load_dotenv(ROOT / ".env")
 LLM = ChatGroq(model=MODEL, api_key=os.getenv("GROQ_API_KEY"), temperature=0)
+TRACER = OpikTracer(tags=["sellerpulse"])  # sends model + tool calls to Opik, inside the current trace
 print(f"Ready: {len(DOCS)} documents embedded.")
 
 
@@ -117,6 +121,7 @@ def find_sku(question):
     return matches[0] if len(matches) == 1 else None
 
 
+@track(name="retrieve")
 def retrieve(question):
     """This seller's K closest documents, as (document, distance) pairs. Lower = closer."""
     sku = find_sku(question)
@@ -182,6 +187,7 @@ def get_sales_analytics(period: str, sku: str = "") -> dict:
 # Hard rule in code: a preference may never remove the DRAFT label / her approval (rule 3).
 BREAKS_RULES = re.compile(r"\b(never|no|don['’]?t|do not|stop|skip|remove|drop|omit|without)\b.*\b(draft|approv)\w*", re.I)
 
+@track(name="load_preferences")
 def load_preferences():
     """This seller's saved preferences from memory.json (an empty list if none yet)."""
     memory = json.loads(MEMORY_FILE.read_text()) if MEMORY_FILE.exists() else {}
@@ -219,6 +225,7 @@ TRACE = {}  # what the last answer used: Shop data and tool calls (read by the e
 
 
 # ---------------------------------------------------------------- 6. Answer (the agent loop)
+@track(name="answer")  # one Opik trace per question
 def answer(question):
     """Retrieve -> ask Groq -> if it asks for the tool, run it and ask again -> return the text."""
     TRACE.clear()
@@ -230,6 +237,7 @@ def answer(question):
     other += [s for s in re.findall(r"\bS\d{3}\b", question.upper()) if s != SELLER_ID]
     if other:  # privacy guardrail in code: never discuss another seller (ID, name or shop name)
         print("Blocked: question mentions another seller", other)
+        opik_context.update_current_trace(tags=["blocked"], metadata={"seller_id": SELLER_ID, "blocked_terms": other})
         return f"I can only show data for your own shop, {STORE_NAME}."
     hits = retrieve(question)
     shop_data = "\n\n".join(f"[{doc.metadata['id']}] {doc.page_content}" for doc, _ in hits)
@@ -239,6 +247,7 @@ def answer(question):
     hint = f"\n(The question is about listing {sku}.)" if sku else ""
     prefs = load_preferences()
     TRACE["preferences"] = prefs
+    opik_context.update_current_trace(metadata={"seller_id": SELLER_ID, "model": MODEL, "preferences": prefs})
     system = SYSTEM_PROMPT
     if prefs:
         print("Preferences:", prefs)
@@ -248,13 +257,13 @@ def answer(question):
                 ("human", f"Shop data:\n{shop_data or '(no matching shop data)'}\n\nQuestion: {question}{hint}")]
     try:
         for _ in range(3):  # at most 3 rounds of tool use
-            reply = AGENT.invoke(messages)
+            reply = AGENT.invoke(messages, config={"callbacks": [TRACER]})
             if not reply.tool_calls:
                 return reply.content
             messages.append(reply)
             for call in reply.tool_calls:
                 tool_fn = TOOLS.get(call["name"])
-                result = tool_fn.invoke(call["args"]) if tool_fn else {"error": f"No tool named {call['name']}"}
+                result = tool_fn.invoke(call["args"], config={"callbacks": [TRACER]}) if tool_fn else {"error": f"No tool named {call['name']}"}
                 print("Tool:", call["name"], call["args"], "->", json.dumps(result))
                 TRACE["calls"].append({"args": call["args"], "result": result})
                 messages.append(ToolMessage(json.dumps(result), tool_call_id=call["id"]))
@@ -275,6 +284,7 @@ if __name__ == "__main__":
         for run in range(1, repeat + 1):
             print(f"\n===== Run {run} of {repeat}: {question}")
             print(answer(question))
+        opik.flush_tracker()  # send the traces before the script exits
     else:
         gr.ChatInterface(
             fn=lambda message, history: answer(message),
