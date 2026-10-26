@@ -1,0 +1,18 @@
+# NeMo Guardrails config for SellerPulse (stage 3.5: hello example)
+# Which model runs the checks: Groq's small model, through Groq's OpenAI-compatible address.
+models:
+  - type: main
+    engine: groq
+    model: openai/gpt-oss-safeguard-20b
+    parameters:
+      base_url: https://api.groq.com/openai/v1
+      temperature: 0
+
+# Which checks are switched on.
+rails:
+  input:
+    flows:
+      - self check input      # check Meera's message before SellerPulse sees it
+  output:
+    flows:
+      - self check output     # check SellerPulse's answer before Meera sees it
