@@ -233,6 +233,19 @@ TRACE = {}  # what the last answer used: Shop data and tool calls (read by the e
 INPUT_BLOCKED = "I can't help with that. I can help with your sales, listings, reviews and Setukart policy."
 OUTPUT_BLOCKED = "I held back that answer because it broke a safety rule. Please rephrase your question."
 CHECK_FAILED = "The safety check is unavailable right now. Please try again in a moment."
+H = r"[-\u2010\u2011]"  # normal, Unicode and non-breaking hyphens (the model uses all three)
+CODES = re.compile(rf"\s*[\[(【]\s*(?:review{H})?(?:REV|SKU){H}\d+\s*[\])】]|\b(?:review{H})?(?:REV|SKU){H}\d+\b")
+
+
+def strip_ids(text):
+    """Remove internal codes (REV-1024, SKU-1001, [review-REV-1024]) from a draft for a buyer. Hard rule: code."""
+    if not text.lstrip().startswith("DRAFT"):
+        return text  # only drafts go to buyers; answers for Meera keep their sources
+    cleaned = CODES.sub("", text)
+    cleaned = re.sub(r"[ \t]+([,.;:!?])", r"\1", cleaned)                    # no space before punctuation
+    cleaned = re.sub(r"[,;](?=[,.;:!?])", "", cleaned)                         # no leftover comma before a full stop
+    cleaned = re.sub(r"[ \t]{2,}", " ", cleaned)                              # no double spaces
+    return re.sub(r"\n[ \t,]*\n([ \t,]*\n)+", "\n\n", cleaned).rstrip()   # no empty leftover lines
 
 
 def tag_blocked():
@@ -255,6 +268,10 @@ def nemo_check(question, reply=None):
 
 def checked(question, text):
     """The answer if NeMo's output check allows it, otherwise a refusal (also when the check fails)."""
+    cleaned = strip_ids(text)  # fix 1: internal codes never reach a buyer draft
+    if cleaned != text:
+        print("Removed internal codes from the draft")
+        text = cleaned
     try:
         allowed = nemo_check(question, text)
     except Exception as err:  # e.g. rate limit: safer to say no than to show an unchecked answer
