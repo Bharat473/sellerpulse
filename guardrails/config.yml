@@ -7,6 +7,7 @@ models:
     parameters:
       base_url: https://api.groq.com/openai/v1
       temperature: 0
+      reasoning_effort: low
 
 # Which checks are switched on.
 rails:
