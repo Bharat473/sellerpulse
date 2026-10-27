@@ -233,6 +233,8 @@ TRACE = {}  # what the last answer used: Shop data and tool calls (read by the e
 INPUT_BLOCKED = "I can't help with that. I can help with your sales, listings, reviews and Setukart policy."
 OUTPUT_BLOCKED = "I held back that answer because it broke a safety rule. Please rephrase your question."
 CHECK_FAILED = "The safety check is unavailable right now. Please try again in a moment."
+BUYER_LABEL = "[Reply for a buyer]"                                  # fix 2: tell the output check what it reads
+SELLER_LABEL = "[Answer for the seller only, never sent to buyers]"
 H = r"[-\u2010\u2011]"  # normal, Unicode and non-breaking hyphens (the model uses all three)
 CODES = re.compile(rf"\s*[\[(【]\s*(?:review{H})?(?:REV|SKU){H}\d+\s*[\])】]|\b(?:review{H})?(?:REV|SKU){H}\d+\b")
 
@@ -261,7 +263,8 @@ def nemo_check(question, reply=None):
     """NeMo check of the question alone (input) or of question + answer (output). True = allowed."""
     messages = [{"role": "user", "content": question}]
     if reply is not None:
-        messages.append({"role": "assistant", "content": reply})
+        label = BUYER_LABEL if reply.lstrip().startswith("DRAFT") else SELLER_LABEL  # code knows; the checker needn't guess
+        messages.append({"role": "assistant", "content": f"{label}\n{reply}"})
     kind = RailType.INPUT if reply is None else RailType.OUTPUT
     return RAILS.check(messages, rail_types=[kind]).status.value != "blocked"
 
