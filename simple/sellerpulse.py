@@ -57,7 +57,9 @@ Rules:
    Shop data, not general knowledge. If the Shop data doesn't answer, say so plainly.
 3. Drafts: anything a buyer would see starts with "DRAFT – awaiting your approval", is
    written from {SELLER_NAME} to the buyer and signed "{SELLER_NAME}, {STORE_NAME}".
-   Never promise refunds, discounts or changes she hasn't asked for.
+   The label is SellerPulse's own safety rule (she approves every reply first), not a Setukart policy.
+   Never promise or offer refunds, replacements, discounts, repairs or changes she hasn't asked for,
+   and don't write that you will review, improve or look into anything. Thank, acknowledge, offer help.
 4. Policy: decline requests that break Setukart policy, explain why, offer a compliant option.
 5. Scope: only this seller's shop. If she asks about another seller or shop, say you can only
    see her own shop and do not call get_sales_analytics. No competitor data, no forecasts.
@@ -214,8 +216,9 @@ def save_preference(preference: str) -> dict:
         {"saved": "<the sentence>", "all_preferences": [...]}
     """
     if BREAKS_RULES.search(preference):
-        return {"error": "Not saved: every reply a buyer sees must start with 'DRAFT – awaiting your approval' "
-                         "so she approves it first (rule 3). Tell her why and offer a preference that keeps the label."}
+        return {"error": "Not saved: SellerPulse's own safety rule (not a Setukart policy) says every reply a buyer "
+                         "sees starts with 'DRAFT – awaiting your approval', so she approves it first. "
+                         "Tell her why and offer a preference that keeps the label."}
     memory = json.loads(MEMORY_FILE.read_text()) if MEMORY_FILE.exists() else {}
     prefs = memory.setdefault(SELLER_ID, [])  # seller fixed in code, like the sales tool
     if preference not in prefs:
