@@ -1,0 +1,2 @@
+gradio>=6.0
+langchain-groq>=1.1
